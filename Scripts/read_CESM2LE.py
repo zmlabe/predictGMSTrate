@@ -209,7 +209,7 @@ def read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper
         print(time[yearhistq])
         histmodel = ensshape[:,yearhistq,:,:]
     elif timeper == 'hiatus':
-        yearhistq = np.where((time >= 1980) & (time <= 2099))[0]
+        yearhistq = np.where((time >= 1979) & (time <= 2099))[0]
         print('FUTURE YEARS')
         print(time[yearhistq])
         histmodel = ensshape[:,yearhistq,:,:]
