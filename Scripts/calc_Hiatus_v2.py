@@ -33,10 +33,12 @@ def calc_thresholdOfTrend(data,trendlength,years,AGWstart,typeOfTrend):
     -------
     SLOPEthresh : float 
         float of the actual trend for hiatus or acceleration
+    obsdiff : float
+        difference compared to mean decadal trencds and the hiatus/acceleration
 
     Usage
     -----
-    SLOPEthresh = calc_thresholdOfTrend(data,trendlength,years,AGWstart,typeOfTrend)
+    SLOPEthresh,obsdiff = calc_thresholdOfTrend(data,trendlength,years,AGWstart,typeOfTrend)
     """
     print('\n>>>>>>>>>> Using calc_thresholdOfTrend function!')
     
@@ -73,16 +75,45 @@ def calc_thresholdOfTrend(data,trendlength,years,AGWstart,typeOfTrend):
         
         if typeOfTrend == 'hiatus':
             SLOPEthresh = meantrend - (1*stdslope)
+            obsdiff = abs(np.nanmin(slope) - meantrend)
         elif typeOfTrend == 'accel':
-            SLOPEthresh = meantrend + (1*stdslope) 
+            SLOPEthresh = meantrend + (1*stdslope)
+            obsdiff = np.nanmax(slope) - meantrend
+        
+    elif data.ndim == 2:
+        ### Pick start of forced climate change
+        yrq = np.where(years[:] >= AGWstart)[0]
+        data = data[:,yrq]
+        yearsnew = years[yrq]
+        print('Years-Trend ---->\n',yearsnew)
+        
+        ensmean = np.nanmean(data,axis=0)
+        yearstrendens = np.empty((len(yearsnew)-trendlength+1,trendlength))
+        datatrendens = np.empty((len(yearsnew)-trendlength+1,trendlength))
+        for hi in range(len(yearsnew)-(trendlength-1)):
+            yearstrendens[hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
+            datatrendens[hi,:] = ensmean[hi:hi+trendlength]
+
+        ### Calculate trend lines    
+        linetrendens = np.empty((len(yearsnew)-trendlength+1,2))
+        for hi in range(len(yearsnew)-trendlength+1):
+            linetrendens[hi,:] = np.polyfit(yearstrendens[hi],datatrendens[hi],1)
+            
+        ### Slopes
+        slopeens = linetrendens[:,0]
+        stdslopeens = np.nanstd(slopeens)
+        meantrendens = np.nanmean(slopeens) 
+        SLOPEthresh = slopeens
+        obsdiff = np.nan
+            
     else:
         print(ValueError('WRONG DIMENSIONS OF OBS!'))
         sys.exit()
         
     print('>>>>>>>>>> Ending calc_thresholdOfTrend function!')
-    return SLOPEthresh
+    return SLOPEthresh,obsdiff
 
-def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
+def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffBase):
     """
     Function calculates actual trend analysis of hiatus or acceleration in 
     observations and climate model data
@@ -101,6 +132,8 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
         float of the actual trend for hiatus or acceleration
     typeOfTrend : string
         hiatus or accel
+    diffBase : float
+        difference from mean trend trends and obs hiatus/acceleration events
         
     Returns
     -------
@@ -113,10 +146,9 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
     classes : n-day array
         array of binary numbers for yes event or no event
     
-
     Usage
     -----
-    yearstrend,linetrend,indexslopeNegative,classes = calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend)
+    yearstrend,linetrend,indexslopeNegative,classes = calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffBase)
     """
     print('\n>>>>>>>>>> Using calc_HiatusAcc function!')
     
@@ -125,8 +157,41 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
     import sys
     
     hiatusSLOPE = SLOPEthresh
-    
-    if data.ndim == 2:
+                
+    if data.ndim == 1:    
+        yrq = np.where(years[:] >= AGWstart)[0]
+        data = data[yrq]
+        yearsnew = years[yrq]
+        print('Years-Trend ---->\n',yearsnew)
+      
+        ### Calculate trend periods
+        yearstrend = np.empty((len(yearsnew)-trendlength+1,trendlength))
+        datatrend = np.empty((len(yearsnew)-trendlength+1,trendlength))
+        for hi in range(len(yearsnew)-(trendlength-1)):
+            yearstrend[hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
+            datatrend[hi,:] = data[hi:hi+trendlength]
+
+        ### Calculate trend lines    
+        linetrend = np.empty((len(yearsnew)-trendlength+1,2))
+        for hi in range(len(yearsnew)-trendlength+1):         
+            linetrend[hi,:] = np.polyfit(yearstrend[hi],datatrend[hi],1)
+            
+        ### Count number of hiatus or acceleration periods
+        slope = linetrend[:,0]     
+        if typeOfTrend == 'hiatus':
+            indexslopeNegative = np.where((slope[:] <= hiatusSLOPE))[0]
+        elif typeOfTrend == 'accel':
+            indexslopeNegative = np.where((slope[:] > hiatusSLOPE))[0]
+        else:
+            print(ValueError('--- WRONG TYPE OF EVENT! ---'))
+            sys.exit()
+        print('INDEX OF **%s**---->' % typeOfTrend,indexslopeNegative)
+        
+        ### Calculate classes
+        classes = np.zeros((len(yearsnew)))
+        classes[indexslopeNegative] = 1
+         
+    elif data.ndim == 2:
         yrq = np.where(years[:] >= AGWstart)[0]
         data = data[:,yrq]
         yearsnew = years[yrq]
@@ -150,22 +215,25 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
             
         ### Count number of hiatus periods
         slope = linetrend[:,:,0]
+
         if typeOfTrend == 'hiatus':
             indexslopeNegative = []
             for e in range(ens):
-                indexslopeNegativeq = np.where((slope[e,:] <= hiatusSLOPE))[0]
-                if len(indexslopeNegativeq) == 0:
-                    indexslopeNegative.append([np.nan])
-                else:
-                    indexslopeNegative.append(indexslopeNegativeq)
+                hiatusSLOPEq = hiatusSLOPE-diffBase
+                indexslopeNegativeyr = []
+                for yr in range(hiatusSLOPEq.shape[0]):
+                    if slope[e,yr] <= hiatusSLOPEq[yr]:
+                        indexslopeNegativeyr.append(yr)
+                indexslopeNegative.append(indexslopeNegativeyr)
         elif typeOfTrend == 'accel':
             indexslopeNegative = []
             for e in range(ens):
-                indexslopeNegativeq = np.where((slope[e,:] > hiatusSLOPE))[0]
-                if len(indexslopeNegativeq) == 0:
-                    indexslopeNegative.append([np.nan])
-                else:
-                    indexslopeNegative.append(indexslopeNegativeq)
+                hiatusSLOPEq = hiatusSLOPE+diffBase
+                indexslopeNegativeyr = []
+                for yr in range(hiatusSLOPEq.shape[0]):
+                    if slope[e,yr] > hiatusSLOPEq[yr]:
+                        indexslopeNegativeyr.append(yr)
+                indexslopeNegative.append(indexslopeNegativeyr)
         else:
             print(ValueError('--- WRONG TYPE OF EVENT! ---'))
             sys.exit()
@@ -173,58 +241,7 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend):
         ### Calculate classes
         classes = np.zeros((data.shape))
         for e in range(ens):
-            indexFirstHiatus = []
-            for i in range(len(indexslopeNegative[e])):
-                if i == 0:
-                    saveFirstHiatusYR = indexslopeNegative[e][i]
-                    indexFirstHiatus.append(saveFirstHiatusYR)
-                elif indexslopeNegative[e][i]-1 != indexslopeNegative[e][i-1]:
-                    saveFirstHiatusYR = indexslopeNegative[e][i]
-                    indexFirstHiatus.append(saveFirstHiatusYR)
-                
-            classes[e,indexFirstHiatus] = 1
-                
-    elif data.ndim == 1:    
-        yrq = np.where(years[:] >= AGWstart)[0]
-        data = data[yrq]
-        yearsnew = years[yrq]
-        print('Years-Trend ---->\n',yearsnew)
-      
-        ### Calculate trend periods
-        yearstrend = np.empty((len(yearsnew)-trendlength+1,trendlength))
-        datatrend = np.empty((len(yearsnew)-trendlength+1,trendlength))
-        for hi in range(len(yearsnew)-(trendlength-1)):
-            yearstrend[hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
-            datatrend[hi,:] = data[hi:hi+trendlength]
-
-        print(yearstrend)
-        ### Calculate trend lines    
-        linetrend = np.empty((len(yearsnew)-trendlength+1,2))
-        for hi in range(len(yearsnew)-trendlength+1):         
-            linetrend[hi,:] = np.polyfit(yearstrend[hi],datatrend[hi],1)
-            
-        ### Count number of hiatus or acceleration periods
-        slope = linetrend[:,0]     
-        if typeOfTrend == 'hiatus':
-            indexslopeNegative = np.where((slope[:] <= hiatusSLOPE))[0]
-        elif typeOfTrend == 'accel':
-            indexslopeNegative = np.where((slope[:] > hiatusSLOPE))[0]
-        else:
-            print(ValueError('--- WRONG TYPE OF EVENT! ---'))
-            sys.exit()
-        print('INDEX OF **%s**---->' % typeOfTrend,indexslopeNegative)
-        
-        ### Calculate classes
-        indexFirstHiatus = []
-        for i in range(len(indexslopeNegative)):
-            if i == 0:
-                saveFirstHiatusYR = indexslopeNegative[i]
-                indexFirstHiatus.append(saveFirstHiatusYR)
-            elif indexslopeNegative[i]-1 != indexslopeNegative[i-1]:
-                saveFirstHiatusYR = indexslopeNegative[i]
-                indexFirstHiatus.append(saveFirstHiatusYR)
-        classes = np.zeros((len(yearsnew)))
-        classes[indexFirstHiatus] = 1
+            classes[e,indexslopeNegative[e]] = 1
      
     print('\n>>>>>>>>>> Ending calc_HiatusAcc function!')                         
     return yearstrend,linetrend,indexslopeNegative,classes

@@ -58,7 +58,7 @@ baseline = np.arange(1951,1980+1,1)
 ###############################################################################
 ###############################################################################
 window = 0
-yearsall = np.arange(1980+window,2099+1,1)
+yearsall = np.arange(1979+window,2099+1,1)
 yearsobs = np.arange(1979+window,2020+1,1)
 ###############################################################################
 ###############################################################################
@@ -210,23 +210,23 @@ def calc_TrendsObs(data,trendlength,years,AGWstart):
         SLOPEthresh = meantrend - stdslope
         return SLOPEthresh
 
-# hiatus = 10
-# AGWstart = 1980
-# SLOPEthresh = calc_TrendsObs(obsm,hiatus,yearsobs,AGWstart)
-# years_obs,linetrend_obs,indexneg_obs = calc_Hiatus(obsm,hiatus,yearsobs,AGWstart,SLOPEthresh)
-# years_model,linetrend_model,indexneg_model = calc_Hiatus(modelsm,hiatus,yearsall,AGWstart,SLOPEthresh)
+hiatus = 10
+AGWstart = 1980
+SLOPEthresh = calc_TrendsObs(obsm,hiatus,yearsobs,AGWstart)
+years_obs,linetrend_obs,indexneg_obs = calc_Hiatus(obsm,hiatus,yearsobs,AGWstart,SLOPEthresh)
+years_model,linetrend_model,indexneg_model = calc_Hiatus(modelsm,hiatus,yearsall,AGWstart,SLOPEthresh)
 
-# numberOfHiatus = np.empty((len(indexneg_model)))
-# for i in range(len(indexneg_model)):
-#     numberOfHiatus[i] = len(indexneg_model[i])
-# print('\n',numberOfHiatus)
+numberOfHiatus = np.empty((len(indexneg_model)))
+for i in range(len(indexneg_model)):
+    numberOfHiatus[i] = len(indexneg_model[i])
+print('\n',numberOfHiatus)
 
-# ###############################################################################          
-# ### Calculate ensemble spread statistics
-# meaens = np.nanmean(modelsm[:,:],axis=0)
-# maxens = np.nanmax(modelsm[:,:],axis=0)
-# minens = np.nanmin(modelsm[:,:],axis=0)
-# spread = maxens - minens
+###############################################################################          
+### Calculate ensemble spread statistics
+meaens = np.nanmean(modelsm[:,:],axis=0)
+maxens = np.nanmax(modelsm[:,:],axis=0)
+minens = np.nanmin(modelsm[:,:],axis=0)
+spread = maxens - minens
 
 ###############################################################################
 ###############################################################################
@@ -267,7 +267,7 @@ ax.fill_between(yearsall,minens[:],maxens[:],facecolor='deepskyblue',alpha=0.25,
 
 ensmem = 7
 plt.plot(yearsall,modelsm[ensmem],color='darkblue',linewidth=2,alpha=1)
-for hi in range(len(yearsall)-hiatus):
+for hi in range(len(yearsall)-hiatus-1):
     plt.plot(years_model[ensmem,hi],linetrend_model[ensmem,hi,0]*years_model[0,hi]+linetrend_model[ensmem,hi,1],
              color='r',linewidth=0.3,zorder=5,clip_on=False)
 
@@ -304,7 +304,7 @@ ax.fill_between(yearsall,minens[:],maxens[:],facecolor='deepskyblue',alpha=0.25,
 
 ensmem = 7
 plt.plot(yearsall,modelsm[ensmem],color='darkblue',linewidth=2,alpha=1)
-for hi in range(len(yearsall)-hiatus):
+for hi in range(len(yearsall)-hiatus-1):
     if linetrend_model[ensmem,hi,0] <= SLOPEthresh:
         plt.plot(years_model[ensmem,hi],linetrend_model[ensmem,hi,0]*years_model[0,hi]+linetrend_model[ensmem,hi,1],
                  color='r',linewidth=1,zorder=5,clip_on=False)
@@ -403,7 +403,7 @@ ax.tick_params(axis='y',labelsize=7,pad=4)
 
 plt.plot(yearsobs,obsm,color='darkblue',linewidth=2,alpha=1)
 for hi in range(len(yearsobs)-hiatus-1):
-    if linetrend_obs[hi,0] <= SLOPEthresh and linetrend_obs[hi+1,0] > SLOPEthresh:
+    if linetrend_obs[hi,0] <= SLOPEthresh and linetrend_obs[hi-1,0] > SLOPEthresh:
         plt.plot(years_obs[hi],linetrend_obs[hi,0]*years_obs[hi]+linetrend_obs[hi,1],
              color='r',linewidth=1)
     
