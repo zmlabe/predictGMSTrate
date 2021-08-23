@@ -79,26 +79,26 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
 
-# ### Call functions
-# vv = 0
-# mo = 0
-# variq = variables[vv]
-# monthlychoice = monthlychoiceq[mo]
-# directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/'
-# saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
-# print('*Filename == < %s >' % saveData) 
+### Call functions
+vv = 0
+mo = 0
+variq = variables[vv]
+monthlychoice = monthlychoiceq[mo]
+directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/'
+saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
+print('*Filename == < %s >' % saveData) 
 
-# ### Read data
-# models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-#                                         lensalso,randomalso,ravelyearsbinary,
-#                                         ravelbinary,shuffletype,timeper,
-#                                         lat_bounds,lon_bounds)
-# obs,lats,lons = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+### Read data
+models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                        lensalso,randomalso,ravelyearsbinary,
+                                        ravelbinary,shuffletype,timeper,
+                                        lat_bounds,lon_bounds)
+obs,lats,lons = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
 
-# ### Calculate global mean temperature
-# lon2,lat2 = np.meshgrid(lons,lats)
-# modelsm = UT.calc_weightedAve(models,lat2)
-# obsm = UT.calc_weightedAve(obs,lat2)
+### Calculate global mean temperature
+lon2,lat2 = np.meshgrid(lons,lats)
+modelsm = UT.calc_weightedAve(models,lat2)
+obsm = UT.calc_weightedAve(obs,lat2)
 
 trendlength = 10
 AGWstart = 1990
