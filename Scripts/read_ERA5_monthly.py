@@ -69,7 +69,7 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
-    var = data.variables['%s' % variq][-monthslice:,:,:]
+    var = data.variables['%s' % variq][:,:,:]
     data.close()
     
     print('Years of output =',sliceyear.min(),'to',sliceyear.max())
@@ -185,10 +185,10 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
-# variq = 'P'
+# variq = 'T2M'
 # directory = '/Users/zlabe/Data/ERA5/'
 # sliceperiod = 'annual'
-# sliceyear = np.arange(1979,2019+1,1)
+# sliceyear = np.arange(1979,2020+1,1)
 # sliceshape = 3
 # slicenan = 'nan'
 # addclimo = True

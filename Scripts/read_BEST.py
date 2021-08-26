@@ -67,7 +67,7 @@ def read_BEST(directory,sliceperiod,sliceyear,sliceshape,addclimo,slicenan):
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
-    anom = data.variables['T2M'][-monthslice:,:,:]
+    anom = data.variables['T2M'][:,:,:]
     data.close()
     
     print('Years of output =',sliceyear.min(),'to',sliceyear.max())

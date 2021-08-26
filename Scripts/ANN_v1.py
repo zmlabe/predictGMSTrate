@@ -95,98 +95,98 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
     print('our OBS dataset: ',dataset_obs,' is shaped',data_obs.shape)
     return data_obs,lats_obs,lons_obs
 
-# ### Call functions
-# trendlength = 10
-# AGWstart = 1990
-# years_newmodel = np.arange(AGWstart,yearsall[-1]+1,1)
-# years_newobs = np.arange(AGWstart,yearsobs[-1]+1,1)
-# vv = 0
-# mo = 0
-# variq = variables[vv]
-# monthlychoice = monthlychoiceq[mo]
-# directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/'
-# saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
-# print('*Filename == < %s >' % saveData) 
+### Call functions
+trendlength = 10
+AGWstart = 1990
+years_newmodel = np.arange(AGWstart,yearsall[-1]+1,1)
+years_newobs = np.arange(AGWstart,yearsobs[-1]+1,1)
+vv = 0
+mo = 0
+variq = variables[vv]
+monthlychoice = monthlychoiceq[mo]
+directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/'
+saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
+print('*Filename == < %s >' % saveData) 
 
-# ### Read data for hiatus periods
-# models = []
-# modelsm = []
-# obs = []
-# obsm = []
-# SLOPEthreshh_o = []
-# SLOPEthreshh_m = []
-# diff_o = []
-# diff_m = []
-# yearstrend_obsh = []
-# linetrend_obsh = []
-# indexslopeNegative_obsh = []
-# classes_obsh = []
-# yearstrend_mh = []
-# linetrend_mh = []
-# indexslopeNegative_mh = []
-# classes_mh = []
-# count = []
-# for i in range(len(modelGCMs)):
-#     dataset = modelGCMs[i]
-#     modelsq,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
-#                                             lensalso,randomalso,ravelyearsbinary,
-#                                             ravelbinary,shuffletype,timeper,
-#                                             lat_bounds,lon_bounds)
-#     obsq,lats,lons = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+### Read data for hiatus periods
+models = []
+modelsm = []
+obs = []
+obsm = []
+SLOPEthreshh_o = []
+SLOPEthreshh_m = []
+diff_o = []
+diff_m = []
+yearstrend_obsh = []
+linetrend_obsh = []
+indexslopeNegative_obsh = []
+classes_obsh = []
+yearstrend_mh = []
+linetrend_mh = []
+indexslopeNegative_mh = []
+classes_mh = []
+count = []
+for i in range(len(modelGCMs)):
+    dataset = modelGCMs[i]
+    modelsq,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                            lensalso,randomalso,ravelyearsbinary,
+                                            ravelbinary,shuffletype,timeper,
+                                            lat_bounds,lon_bounds)
+    obsq,lats,lons = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
     
-#     ### Calculate global mean temperature
-#     lon2,lat2 = np.meshgrid(lons,lats)
-#     modelsmq = UT.calc_weightedAve(modelsq,lat2)
-#     obsmq = UT.calc_weightedAve(obsq,lat2)
+    ### Calculate global mean temperature
+    lon2,lat2 = np.meshgrid(lons,lats)
+    modelsmq = UT.calc_weightedAve(modelsq,lat2)
+    obsmq = UT.calc_weightedAve(obsq,lat2)
     
-#     ### Calculate thresholds for hiatus period
-#     SLOPEthreshh_oq,diff_oq = HA.calc_thresholdOfTrend(obsmq,trendlength,yearsobs,AGWstart,'hiatus')
-#     SLOPEthreshh_mq,diff_mq = HA.calc_thresholdOfTrend(modelsmq,trendlength,yearsall,AGWstart,'hiatus')
+    ### Calculate thresholds for hiatus period
+    SLOPEthreshh_oq,diff_oq = HA.calc_thresholdOfTrend(obsmq,trendlength,yearsobs,AGWstart,'hiatus')
+    SLOPEthreshh_mq,diff_mq = HA.calc_thresholdOfTrend(modelsmq,trendlength,yearsall,AGWstart,'hiatus')
     
-#     ### Calculate actual hiatus periods in climate models and observations
-#     yearstrend_obshq,linetrend_obshq,indexslopeNegative_obshq,classes_obshq = HA.calc_HiatusAcc(obsmq,trendlength,yearsobs,AGWstart,SLOPEthreshh_oq,'hiatus',diff_oq)
-#     yearstrend_mhq,linetrend_mhq,indexslopeNegative_mhq,classes_mhq = HA.calc_HiatusAcc(modelsmq,trendlength,yearsall,AGWstart,SLOPEthreshh_mq,'hiatus',diff_oq)
+    ### Calculate actual hiatus periods in climate models and observations
+    yearstrend_obshq,linetrend_obshq,indexslopeNegative_obshq,classes_obshq = HA.calc_HiatusAcc(obsmq,trendlength,yearsobs,AGWstart,SLOPEthreshh_oq,'hiatus',diff_oq)
+    yearstrend_mhq,linetrend_mhq,indexslopeNegative_mhq,classes_mhq = HA.calc_HiatusAcc(modelsmq,trendlength,yearsall,AGWstart,SLOPEthreshh_mq,'hiatus',diff_oq)
 
-#     ### County how many hiatus
-#     countq = len(indexslopeNegative_mhq)
+    ### County how many hiatus
+    countq = len(indexslopeNegative_mhq)
 
-#     ### Save for each data set separately
-#     models.append(modelsq)
-#     modelsm.append(modelsmq)
-#     obs.append(obsq)
-#     obsm.append(obsmq)
-#     SLOPEthreshh_o.append(SLOPEthreshh_oq)
-#     SLOPEthreshh_m.append(SLOPEthreshh_mq)
-#     diff_o.append(diff_oq)
-#     diff_m.append(diff_mq)
-#     yearstrend_obsh.append(yearstrend_obshq)
-#     linetrend_obsh.append(linetrend_obshq)
-#     indexslopeNegative_obsh.append(indexslopeNegative_obshq)
-#     classes_obsh.append(classes_obshq)
-#     yearstrend_mh.append(yearstrend_mhq)
-#     linetrend_mh.append(linetrend_mhq)
-#     indexslopeNegative_mh.append(indexslopeNegative_mhq)
-#     classes_mh.append(classes_mhq)
-#     count.append(countq)
+    ### Save for each data set separately
+    models.append(modelsq)
+    modelsm.append(modelsmq)
+    obs.append(obsq)
+    obsm.append(obsmq)
+    SLOPEthreshh_o.append(SLOPEthreshh_oq)
+    SLOPEthreshh_m.append(SLOPEthreshh_mq)
+    diff_o.append(diff_oq)
+    diff_m.append(diff_mq)
+    yearstrend_obsh.append(yearstrend_obshq)
+    linetrend_obsh.append(linetrend_obshq)
+    indexslopeNegative_obsh.append(indexslopeNegative_obshq)
+    classes_obsh.append(classes_obshq)
+    yearstrend_mh.append(yearstrend_mhq)
+    linetrend_mh.append(linetrend_mhq)
+    indexslopeNegative_mh.append(indexslopeNegative_mhq)
+    classes_mh.append(classes_mhq)
+    count.append(countq)
     
-# ### Check for arrays
-# models = np.asarray(models)
-# modelsm = np.asarray(modelsm)
-# obs = np.asarray(obs).squeeze()
-# obsm = np.asarray(obsm).squeeze()
-# SLOPEthreshh_o = np.asarray(SLOPEthreshh_o).squeeze()
-# SLOPEthreshh_m = np.asarray(SLOPEthreshh_m)
-# diff_o = np.asarray(diff_o).squeeze()
-# diff_m = np.asarray(diff_m)
-# yearstrend_obsh = np.asarray(yearstrend_obsh).squeeze()
-# linetrend_obsh = np.asarray(linetrend_obsh).squeeze()
-# indexslopeNegative_obsh = np.asarray(indexslopeNegative_obsh).squeeze()
-# classes_obsh = np.asarray(classes_obsh).squeeze()
-# yearstrend_mh = np.asarray(yearstrend_mh)
-# linetrend_mh = np.asarray(linetrend_mh)
-# indexslopeNegative_mh = np.asarray(indexslopeNegative_mh)
-# classes_mh = np.asarray(classes_mh)
-# count = np.asarray(count)
+### Check for arrays
+models = np.asarray(models)
+modelsm = np.asarray(modelsm)
+obs = np.asarray(obs).squeeze()
+obsm = np.asarray(obsm).squeeze()
+SLOPEthreshh_o = np.asarray(SLOPEthreshh_o).squeeze()
+SLOPEthreshh_m = np.asarray(SLOPEthreshh_m)
+diff_o = np.asarray(diff_o).squeeze()
+diff_m = np.asarray(diff_m)
+yearstrend_obsh = np.asarray(yearstrend_obsh).squeeze()
+linetrend_obsh = np.asarray(linetrend_obsh).squeeze()
+indexslopeNegative_obsh = np.asarray(indexslopeNegative_obsh).squeeze()
+classes_obsh = np.asarray(classes_obsh).squeeze()
+yearstrend_mh = np.asarray(yearstrend_mh)
+linetrend_mh = np.asarray(linetrend_mh)
+indexslopeNegative_mh = np.asarray(indexslopeNegative_mh)
+classes_mh = np.asarray(classes_mh)
+count = np.asarray(count)
 
 ### Function to read in predictor variables (SST/OHC)
 models_var = []
@@ -339,3 +339,15 @@ XobsS[np.isnan(XobsS)] = 0.
 testobs = model.predict(XobsS)
 selectobs = np.argmax(testobs,axis=1)
 actualobs = classes_obsh
+
+### Start saving everything, including the ANN
+dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
+savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+
+modelwrite = dirname + savename + '.h5'
+model.save_weights(modelwrite)
+
+if(rm_ensemble_mean==True):
+    savename = savename + '_EnsembleMeanRemoved' 
+ 
+np.savez(dirname + savename + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons)

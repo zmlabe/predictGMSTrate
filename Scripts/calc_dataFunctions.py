@@ -105,6 +105,16 @@ def readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyear
                                               monthlychoice,sliceyearGG,
                                               sliceshapeGG,addclimoGG,
                                               slicenanGG)
+    elif dataset == 'OHC':
+        import read_OHCobs_monthly as OH
+        directorydataOH = '/Users/zlabe/Data/'
+        sliceyearOH = np.arange(1979,2020+1,1)
+        sliceshapeOH = 3
+        slicenanOH = 'nan'
+        ohcDATA = 'IAP'
+        ENSmean = np.nan
+        lat1,lon1,data = OH.read_OHCobs(variq,directorydataOH,ohcDATA,monthlychoice,
+                                        sliceyearOH,sliceshapeOH,slicenanOH)
     elif dataset == '20CRv3':
         import read_20CRv3_monthly as TW
         directorydataTW = '/Users/zlabe/Data/20CRv3/'
@@ -317,16 +327,16 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
     return datanew,latn,lonn   
 
 ### Test functions - do not use!
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import calc_Utilities as UT
-# numOfEns = 40
-# lensalso = True
-# ravelyearsbinary = False
-# ravelbinary = False
-# randomalso = False
-# shuffletype = 'GAUSS'
-# timeper = 'historical'
-# data,lat1,lon1 = readFiles('T2M','all_cesmlens','annual',numOfEns,lensalso,
-#                             randomalso,ravelyearsbinary,ravelbinary,
-#                             shuffletype,timeper)
+import numpy as np
+import matplotlib.pyplot as plt
+import calc_Utilities as UT
+numOfEns = 40
+lensalso = True
+ravelyearsbinary = False
+ravelbinary = False
+randomalso = False
+shuffletype = 'GAUSS'
+timeper = 'historical'
+data,lat1,lon1 = readFiles('OHC100','OHC','annual',numOfEns,lensalso,
+                            randomalso,ravelyearsbinary,ravelbinary,
+                            shuffletype,timeper)

@@ -69,7 +69,7 @@ def read_20CRv3_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclim
     data = Dataset(directory + filename,'r')
     lat1 = data.variables['latitude'][:]
     lon1 = data.variables['longitude'][:]
-    var = data.variables['%s' % variq][-monthslice:,:,:]
+    var = data.variables['%s' % variq][:,:,:]
     data.close()
     
     print('Years of output =',sliceyear.min(),'to',sliceyear.max())
