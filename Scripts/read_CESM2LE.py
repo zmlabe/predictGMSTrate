@@ -223,12 +223,12 @@ def read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directory = '/Users/zlabe/Data/CESM2-LE/monthly/'
-# vari = 'T2M'
+# vari = 'OHC100'
 # sliceperiod = 'annual'
 # sliceshape = 4
 # slicenan = 'nan'
 # numOfEns = 40
-# timeper = 'historical'
+# timeper = 'all'
 # lat,lon,var = read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper)
 
 # lon2,lat2 = np.meshgrid(lon,lat)

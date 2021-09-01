@@ -203,7 +203,7 @@ def read_OHCobs(variq,directory,ohcDATA,sliceperiod,sliceyear,sliceshape,slicena
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
-# variq = 'OHC100'
+# variq = 'OHC300'
 # directory = '/Users/zlabe/Data/'
 # sliceperiod = 'annual'
 # sliceyear = np.arange(1940,2020+1,1)

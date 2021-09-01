@@ -10,7 +10,7 @@ Version    : 1
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-import calc_Hiatus_v2 as HA
+import calc_Hiatus_v3 as HA
 import calc_Utilities as UT
 import calc_dataFunctions as df
 
@@ -158,17 +158,25 @@ plt.plot(timetrend_o,color='maroon',linewidth=4,alpha=1,clip_on=False,
          linestyle='-',label=r'\textbf{ERA5}')
 
 plt.axhline(SLOPEthreshh_o,color='maroon',linewidth=1,linestyle='--',dashes=(1,0.3))
-plt.plot(SLOPEthreshh_m-diff_o,color='teal',linewidth=1,linestyle='--',dashes=(1,0.3))
+plt.plot(SLOPEthreshh_m*diff_o,color='teal',linewidth=1,linestyle='--',dashes=(1,0.3))
+
+### Plot the hiatus events
+classes_mhplot = classes_mh.copy().ravel()
+wherehiatus = np.where(classes_mhplot == 1)
+classes_mhplot[wherehiatus] = -0.05
+classes_mhplot[np.where(classes_mhplot==0)] = np.nan
+classes_mhplot = classes_mhplot.reshape(classes_mh.shape)
+plt.plot(classes_mhplot.transpose()[:-9,:],color='maroon',marker='o',clip_on=False)
     
 plt.ylabel(r'\textbf{10-Year Trends in GMST [$^{\circ}$C/yr]}',fontsize=10,color='dimgrey')
 plt.yticks(np.arange(-0.1,0.15,0.05),map(str,np.round(np.arange(-0.1,0.15,0.05),2)))
-plt.xticks(np.arange(0,101,10),map(str,np.arange(2000,2101,10)))
+plt.xticks(np.arange(0,101,10),map(str,np.arange(1990,2101,10)))
 plt.xlim([0,100])   
 plt.ylim([-0.05,0.1])
 plt.subplots_adjust(bottom=0.15)
 
 leg = plt.legend(shadow=False,fontsize=15,loc='upper center',
-              bbox_to_anchor=(0.5,0.14),fancybox=True,ncol=4,frameon=False,
+              bbox_to_anchor=(0.5,1.15),fancybox=True,ncol=4,frameon=False,
               handlelength=0,handletextpad=0)
 for line,text in zip(leg.get_lines(), leg.get_texts()):
     text.set_color(line.get_color())

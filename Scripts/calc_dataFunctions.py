@@ -326,17 +326,17 @@ def getRegion(data,lat1,lon1,lat_bounds,lon_bounds):
     print('>>>>>>>>>> Completed: getRegion function!')
     return datanew,latn,lonn   
 
-### Test functions - do not use!
-import numpy as np
-import matplotlib.pyplot as plt
-import calc_Utilities as UT
-numOfEns = 40
-lensalso = True
-ravelyearsbinary = False
-ravelbinary = False
-randomalso = False
-shuffletype = 'GAUSS'
-timeper = 'historical'
-data,lat1,lon1 = readFiles('OHC100','OHC','annual',numOfEns,lensalso,
-                            randomalso,ravelyearsbinary,ravelbinary,
-                            shuffletype,timeper)
+# ### Test functions - do not use!
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import calc_Utilities as UT
+# numOfEns = 40
+# lensalso = True
+# ravelyearsbinary = False
+# ravelbinary = False
+# randomalso = False
+# shuffletype = 'GAUSS'
+# timeper = 'historical'
+# data,lat1,lon1 = readFiles('OHC100','OHC','annual',numOfEns,lensalso,
+#                             randomalso,ravelyearsbinary,ravelbinary,
+#                             shuffletype,timeper)
