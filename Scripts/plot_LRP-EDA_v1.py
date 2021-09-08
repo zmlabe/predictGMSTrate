@@ -29,20 +29,43 @@ accurateR = 'WRONG'
 accurateH = 'WRONG'
 
 ### Hyperparamters for files of the ANN model
-variq = 'T2M'
-fac = 0.8
-random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
-random_network_seed = 87750
-hidden = [15,15]
-n_epochs = 500
-batch_size = 128
-lr_here = 0.001
-ridgePenalty = 0.1
-actFun = 'relu'
+rm_ensemble_mean = False
+
+if rm_ensemble_mean == False:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [20,20]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.05
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2099+1,1)
+elif rm_ensemble_mean == True:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [30,30]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.35
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2099+1,1)
+else:
+    print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
+    sys.exit()
 
 ### Naming conventions for files
 directorymodel = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
 savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed)
+if(rm_ensemble_mean==True):
+    savename = savename + '_EnsembleMeanRemoved'  
 
 ### Directories to save files
 directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
@@ -382,4 +405,8 @@ cbar1.ax.tick_params(axis='x', size=.01,labelsize=4)
 cbar1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()
-plt.savefig(directoryfigure + 'LRP-EDA_Observations_v1_AccH-%s_AccR-%s.png' % (accurateH,accurateR),dpi=300)
+plt.subplots_adjust(hspace=0.4)
+if rm_ensemble_mean == True:
+    plt.savefig(directoryfigure + 'LRP-EDA_Observations_v1_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (accurateH,accurateR),dpi=300)
+else:
+    plt.savefig(directoryfigure + 'LRP-EDA_Observations_v1_AccH-%s_AccR-%s.png' % (accurateH,accurateR),dpi=300)

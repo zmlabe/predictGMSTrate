@@ -86,7 +86,7 @@ rm_ensemble_mean = False
 ###############################################################################
 ###############################################################################
 ### Read in model and observational/reanalysis data
-readData = True
+readData = False
 if readData == True:
     def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
         data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
@@ -235,22 +235,60 @@ random_network_seed = 87750
 Xtrain,Ytrain,Xtest,Ytest,Xtrain_shape,Xtest_shape,testIndices,trainIndices,class_weight,random_segment_seed = FRAC.segment_data(models_slice,classes_mh,fac,random_segment_seed)
 
 ### Model paramaters
-hidden = [15,15]
-n_epochs = 500
-batch_size = 128
-lr_here = 0.001
-ridgePenalty = 0.1
-actFun = 'relu'
-input_shape=np.shape(Xtrain)[1]
-output_shape=np.shape(Ytrain)[1]
+if rm_ensemble_mean == True:
+    # OHC100
+    hidden = [30,30]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.35
+    actFun = 'relu'
+    fractWeight = 0.5
+    input_shape=np.shape(Xtrain)[1]
+    output_shape=np.shape(Ytrain)[1]
+    
+    # OHC700
+    # hidden = [20,20]
+    # n_epochs = 500
+    # batch_size = 128
+    # lr_here = 0.001
+    # ridgePenalty = 0.3
+    # actFun = 'relu'
+    # fractWeight = 0.5
+    # input_shape=np.shape(Xtrain)[1]
+    # output_shape=np.shape(Ytrain)[1]
+    
+    # OHC300
+    # hidden = [10,10]
+    # n_epochs = 500
+    # batch_size = 128
+    # lr_here = 0.001
+    # ridgePenalty = 0.15
+    # actFun = 'relu'
+    # fractWeight = 0.5
+    # input_shape=np.shape(Xtrain)[1]
+    # output_shape=np.shape(Ytrain)[1]
+elif rm_ensemble_mean == False:
+    hidden = [20,20]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.05
+    actFun = 'relu'
+    fractWeight = 0.5
+    input_shape=np.shape(Xtrain)[1]
+    output_shape=np.shape(Ytrain)[1]
+else:
+    print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
+    sys.exit()
 
-def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape):
+def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape,fractWeight):
     print('----ANN Training: learning rate = '+str(lr_here)+'; activation = '+actFun+'; batch = '+str(batch_size) + '----')
     keras.backend.clear_session()
     model = keras.models.Sequential()
     
     ### Adjust class weights for too many hiatuses
-    class_weight[1] = class_weight[1]*(0.5)
+    class_weight[1] = class_weight[1]*(fractWeight)
 
     ### Input layer
     model.add(Dense(hidden[0],input_shape=(input_shape,),
@@ -322,7 +360,7 @@ XtrainS,XtestS,stdVals = dSS.standardize_data(Xtrain,Xtest)
 Xmean, Xstd = stdVals  
 
 ### Compile neural network
-model,history = loadmodel(XtrainS,XtestS,Ytrain,Ytest,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape)
+model,history = loadmodel(XtrainS,XtestS,Ytrain,Ytest,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape,fractWeight)
 
 ### Prediction for training/testing
 ypred_train = model.predict(XtrainS)
@@ -359,11 +397,10 @@ plt.plot(actualobs,alpha=0.5,linewidth=2)
 dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
 savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
 
-modelwrite = dirname + savename + '.h5'
-model.save_weights(modelwrite)
-
 if(rm_ensemble_mean==True):
     savename = savename + '_EnsembleMeanRemoved'  
+modelwrite = dirname + savename + '.h5'
+model.save_weights(modelwrite)
 np.savez(dirname + savename + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons,XobsS=XobsS)
 
 ### Observations saving output

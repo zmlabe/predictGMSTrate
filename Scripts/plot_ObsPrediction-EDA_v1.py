@@ -23,27 +23,45 @@ from sklearn.metrics import accuracy_score
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
-### Parameters FOR THIS SCRIPT
-accurateR = False
-accurateH = False
-
 ### Hyperparamters for files of the ANN model
-variq = 'T2M'
-fac = 0.8
-random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
-random_network_seed = 87750
-hidden = [15,15]
-n_epochs = 500
-batch_size = 128
-lr_here = 0.001
-ridgePenalty = 0.1
-actFun = 'relu'
-yearsall = np.arange(1990,2020+1,1)
+rm_ensemble_mean = True
+
+if rm_ensemble_mean == False:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [20,20]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.05
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2020+1,1)
+elif rm_ensemble_mean == True:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [30,30]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.35
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2020+1,1)
+else:
+    print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
+    sys.exit()
 
 ### Naming conventions for files
 directorymodel = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
 savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed)
-
+if(rm_ensemble_mean==True):
+    savename = savename + '_EnsembleMeanRemoved'  
+    
 ### Directories to save files
 directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
 directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v1/Obs/'
@@ -94,6 +112,9 @@ plt.plot(yearsall,confidence[:,0],linewidth=4,color='teal',alpha=1,zorder=3,clip
 plt.plot(yearsall,confidence[:,1],linewidth=2,color='maroon',alpha=1,zorder=3,clip_on=False,
          linestyle='--',dashes=(1,0.3),label=r'\textbf{Hiatus}')
 
+plt.fill_between(x=yearsall[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
+                 alpha=0.3,edgecolor='none')
+
 plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=6)
 plt.xticks(np.arange(1990,2030+1,10),map(str,np.arange(1990,2030+1,10)),size=6)
 plt.xlim([1990,2020])   
@@ -128,6 +149,9 @@ for i in range(len(rects)):
     rects[i].set_color('maroon')
     rects[i].set_edgecolor('w')
     rects[i].set_alpha(0.4)
+    
+plt.fill_between(x=yearsall[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
+             alpha=0.3,edgecolor='none')
 
 plt.yticks(np.arange(0,2,1),map(str,np.round(np.arange(0,2,1),2)),size=6)
 plt.xticks(np.arange(1990,2030+1,10),map(str,np.arange(1990,2030+1,10)),size=6)
@@ -142,4 +166,7 @@ plt.ylabel(r'\textbf{Classification}',color='k',fontsize=10)
         
 plt.tight_layout()
 plt.subplots_adjust(hspace=0.4)
-plt.savefig(directoryfigure + 'Obs-EDA_ConfidencePredictions',dpi=300)
+if rm_ensemble_mean == True:
+    plt.savefig(directoryfigure + 'Obs-EDA_ConfidencePredictions_rmENSEMBLEmean.png',dpi=300)
+else:
+    plt.savefig(directoryfigure + 'Obs-EDA_ConfidencePredictions.png',dpi=300)

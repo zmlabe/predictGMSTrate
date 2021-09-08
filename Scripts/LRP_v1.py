@@ -63,26 +63,53 @@ def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segmen
     
     ### Add weights from compiled model
     savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+    if(rm_ensemble_mean==True):
+        savename = savename + '_EnsembleMeanRemoved'  
+    
     modelwrite = dirname + savename + '.h5'
     model.load_weights(modelwrite)
     
     return model
 
-### Read in hyperparameters
-variq = 'T2M'
-fac = 0.8
-random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
-random_network_seed = 87750
-hidden = [15,15]
-n_epochs = 500
-batch_size = 128
-lr_here = 0.001
-ridgePenalty = 0.1
-actFun = 'relu'
+### Hyperparamters for files of the ANN model
+rm_ensemble_mean = False
 
+if rm_ensemble_mean == False:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [20,20]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.05
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2099+1,1)
+elif rm_ensemble_mean == True:
+    variq = 'T2M'
+    fac = 0.8
+    random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
+    random_network_seed = 87750
+    hidden = [30,30]
+    n_epochs = 500
+    batch_size = 128
+    lr_here = 0.001
+    ridgePenalty = 0.35
+    actFun = 'relu'
+    fractWeight = 0.5
+    yearsall = np.arange(1990,2099+1,1)
+else:
+    print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
+    sys.exit()
+    
 ### Read in data
 directorymodel = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
 savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+if(rm_ensemble_mean==True):
+    savename = savename + '_EnsembleMeanRemoved'  
+
 origdata = np.load(directorymodel + savename + '.npz')
 Xtrain = origdata['Xtrain']
 Ytrain = origdata['Ytrain']
