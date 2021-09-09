@@ -29,7 +29,7 @@ accurateR = 'WRONG'
 accurateH = 'WRONG'
 
 ### Hyperparamters for files of the ANN model
-rm_ensemble_mean = False
+rm_ensemble_mean = True
 
 if rm_ensemble_mean == False:
     variq = 'T2M'
@@ -260,8 +260,11 @@ cbar1.ax.tick_params(axis='x', size=.01,labelsize=4)
 cbar1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()
-plt.savefig(directoryfigure + 'LRP-EDA_Testing_v1_AccH-%s_AccR-%s.png' % (accurateH,accurateR),dpi=300)
-
+if rm_ensemble_mean == True:
+    plt.savefig(directoryfigure + 'LRP-EDA_Testing_v1_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (accurateH,accurateR),dpi=300)
+else:
+    plt.savefig(directoryfigure + 'LRP-EDA_Testing_v1_AccH-%s_AccR-%s.png' % (accurateH,accurateR),dpi=300)
+    
 ##############################################################################
 ##############################################################################
 ##############################################################################  

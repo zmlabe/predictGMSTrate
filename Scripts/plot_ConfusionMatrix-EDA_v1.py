@@ -20,14 +20,14 @@ import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix
+from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 ### Hyperparamters for files of the ANN model
-rm_ensemble_mean = False
+rm_ensemble_mean = True
 
 if rm_ensemble_mean == False:
     variq = 'T2M'
@@ -108,16 +108,30 @@ actual_uniquetest,actual_counttest = np.unique(actual_test ,return_counts=True)
 def accuracyTotalTime(data_pred,data_true):
     """
     Compute accuracy for the entire time series
-    """
-    
+    """  
     data_truer = data_true
     data_predr = data_pred
     accdata_pred = accuracy_score(data_truer,data_predr)
         
     return accdata_pred
-     
+
+def precisionTotalTime(data_pred,data_true):
+    """
+    Compute precision for the entire time series
+    """
+    data_truer = data_true
+    data_predr = data_pred
+    precdata_pred = precision_score(data_truer,data_predr)
+    
+    return precdata_pred
+
+acctrain = accuracyTotalTime(predict_train,actual_train)     
 acctest = accuracyTotalTime(predict_test,actual_test)
+print('Accuracy Training == ',np.round(acctrain,3))
 print('Accuracy Testing == ',np.round(acctest,3))
+
+prectrain = precisionTotalTime(predict_train,actual_train)     
+prectest = precisionTotalTime(predict_test,actual_test)
 
 ###############################################################################
 ###############################################################################
@@ -155,7 +169,7 @@ plt.tick_params(
 
 csm=plt.get_cmap(cmr.ocean_r)
 cs = plt.pcolormesh(plot_cmtrain,shading='faceted',edgecolor='w',
-                    linewidth=3,cmap=csm,vmin=0,vmax=3100)
+                    linewidth=7,cmap=csm,vmin=0,vmax=3100)
 
 ylabels = [r'\textbf{Hiatus}',r'\textbf{Climate Change}']
 plt.yticks(np.arange(0.5,2.5,1),ylabels,ha='center',color='dimgrey',
@@ -169,7 +183,7 @@ xax.set_tick_params(pad=15)
 
 for i in range(plot_cmtrain.shape[0]):
     for j in range(plot_cmtrain.shape[1]):          
-        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtrain[i,j],fontsize=45,
+        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtrain[i,j],fontsize=50,
             color='crimson',va='center',ha='center')
         plt.text(j+0.5,i+0.34,r'\textbf{[ %s \%% ]}' % (np.round(plot_cmtrainNORM[i,j],3)*100),fontsize=10,
             color='dimgrey',va='center',ha='center')
@@ -185,11 +199,18 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TRAINING DATA}',color='k',labelpad=10,fontsize=20)
+cbar.set_label(r'\textbf{TRAINING [Accuracy = %s \%%, Precision = %s \%%]}' % ((np.round(acctrain,3)*100),
+               (np.round(prectrain,3)*100)),color='k',labelpad=10,fontsize=20)
 
 plt.tight_layout()
-plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
+if rm_ensemble_mean == True:
+    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+else:
+    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
 
+###############################################################################
+###############################################################################
+###############################################################################
 ### Try testing data for confusion matrix
 cm_test = confusion_matrix(actual_test,predict_test) 
 cm_test_norm = confusion_matrix(actual_test,predict_test,normalize='true')
@@ -223,7 +244,7 @@ plt.tick_params(
 
 csm=plt.get_cmap(cmr.ocean_r)
 cs = plt.pcolormesh(plot_cmtest,shading='faceted',edgecolor='w',
-                    linewidth=3,cmap=csm,vmin=0,vmax=900)
+                    linewidth=7,cmap=csm,vmin=0,vmax=900)
 
 ylabels = [r'\textbf{Hiatus}',r'\textbf{Climate Change}']
 plt.yticks(np.arange(0.5,2.5,1),ylabels,ha='center',color='dimgrey',
@@ -237,9 +258,9 @@ xax.set_tick_params(pad=15)
 
 for i in range(plot_cmtest.shape[0]):
     for j in range(plot_cmtest.shape[1]):          
-        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtest[i,j],fontsize=45,
+        plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtest[i,j],fontsize=50,
             color='crimson',va='center',ha='center')
-        plt.text(j+0.5,i+0.34,r'\textbf{[ %s \%% ]}' % (np.round(plot_cmtestNORM[i,j],3)*100),fontsize=10,
+        plt.text(j+0.5,i+0.34,r'\textbf{[ %s \%% ]}' % (np.round(plot_cmtestNORM[i,j]*100,1)),fontsize=10,
             color='dimgrey',va='center',ha='center')
         
 plt.text(1,-0.04,r'\textbf{PREDICTED}',color='k',fontsize=10,ha='center',
@@ -253,7 +274,11 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TESTING DATA}',color='k',labelpad=10,fontsize=20)
+cbar.set_label(r'\textbf{TESTING [Accuracy = %s \%%, Precision = %s \%%]}' % ((np.round(acctest,3)*100),
+               (np.round(prectest,3)*100)),color='k',labelpad=10,fontsize=20)
 
 plt.tight_layout()
-plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)
+if rm_ensemble_mean == True:
+    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+else:
+    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)

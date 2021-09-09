@@ -80,13 +80,13 @@ lensalso = True
 ###############################################################################
 ###############################################################################
 ### Processing data steps
-rm_ensemble_mean = False
+rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ### Read in model and observational/reanalysis data
-readData = False
+readData = True
 if readData == True:
     def read_primary_dataset(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper,lat_bounds=lat_bounds,lon_bounds=lon_bounds):
         data,lats,lons = df.readFiles(variq,dataset,monthlychoice,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,timeper)
@@ -417,4 +417,6 @@ np.savetxt(directoryoutput + 'trainingTrueLabels_' + savename + '.txt',actual_cl
 np.savetxt(directoryoutput + 'testingTrueLabels_' + savename + '.txt',actual_classtest)
 
 np.savetxt(directoryoutput + 'trainingPredictedLabels_' + savename + '.txt',ypred_picktrain)
+np.savetxt(directoryoutput + 'trainingPredictedConfidence_' + savename+ '.txt',ypred_train)
 np.savetxt(directoryoutput + 'testingPredictedLabels_' + savename+ '.txt',ypred_picktest)
+np.savetxt(directoryoutput + 'testingPredictedConfidence_' + savename+ '.txt',ypred_test)

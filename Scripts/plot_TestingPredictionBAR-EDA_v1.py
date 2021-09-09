@@ -1,8 +1,9 @@
 """
-First exploratory data analysis for making plots of testing accuracy
+First exploratory data analysis for making plots of testing accuracy using
+bar graph for each ensemble member
 
 Author     : Zachary M. Labe
-Date       : 8 September 2021
+Date       : 9 September 2021
 Version    : 1 (mostly for testing)
 """
 
@@ -16,7 +17,7 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 ### Hyperparamters for files of the ANN model
-rm_ensemble_mean = True
+rm_ensemble_mean = False
 
 if rm_ensemble_mean == False:
     variq = 'T2M'
@@ -110,41 +111,42 @@ for i in range(testindices.shape[0]):
 act_re[np.where(act_re == 0)] = np.nan
 pre_re[np.where(pre_re == 0)] = np.nan
 
-fig = plt.figure()
-ax = plt.subplot(111)
-adjust_spines(ax, ['left', 'bottom'])
-ax.spines['top'].set_color('none')
-ax.spines['right'].set_color('none')
-ax.spines['left'].set_color('dimgrey')
-ax.spines['bottom'].set_color('dimgrey')
-ax.spines['left'].set_linewidth(2)
-ax.spines['bottom'].set_linewidth(2)
-ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
-ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35,clip_on=False)
-
-for i in range(testindices.shape[0]):
-    plt.scatter(yearsall,act_re[i],s=50,color='dimgrey',clip_on=False,zorder=2,
-                edgecolor='k',linewidth=0.1)
-    for yr in range(pre_re.shape[1]):
-        if pre_reconf[i,yr] >= conf10:
-            if act_re[i,yr] == pre_re[i,yr]:
-                cc = 'deepskyblue'
-            elif act_re[i,yr] != pre_re[i,yr]:
-                cc = 'crimson'
-            else:
-                print(ValueError('SOMETHING MIGHT BE WRONG!'))
-                sys.exit()
-            plt.scatter(yearsall[yr],pre_re[i,yr],s=20,color=cc,clip_on=False,
-                        zorder=3,edgecolor='k',linewidth=0.1)
+fig = plt.figure(figsize=(8,5))
+for r in range(len(testindices)):
+    ax = plt.subplot(2,len(testindices)//2,r+1)
+    adjust_spines(ax, ['left', 'bottom'])
+    ax.spines['top'].set_color('none')
+    ax.spines['right'].set_color('none')
+    ax.spines['left'].set_color('dimgrey')
+    ax.spines['bottom'].set_color('dimgrey')
+    ax.spines['left'].set_linewidth(2)
+    ax.spines['bottom'].set_linewidth(2)
+    ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
     
-plt.xticks(np.arange(1990,2101,10),map(str,np.arange(1990,2101,10)),size=6)
-plt.yticks(np.arange(0,testindices.shape[0]+1,1),np.arange(0,testindices.shape[0]+1,1),size=6)
-plt.xlim([1990,2090])   
-plt.ylim([1,testindices.shape[0]])
-plt.xlabel(r'\textbf{Predicted Hiatus - [ TESTING ]}')
-plt.ylabel(r'\textbf{Ensemble Member}')
+    rects = plt.bar(yearsall,act_re[r])
+    plt.plot(yearsall,pre_reconf[r],linewidth=0.8,color='maroon',alpha=1,zorder=3,
+              linestyle='--',dashes=(1,0.3))
+    for i in range(len(rects)):
+        rects[i].set_color('teal')
+        rects[i].set_edgecolor('teal')
+        rects[i].set_alpha(0.6)
+    
+    if any([r==0,r==4]):
+        plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=6)
+        plt.xticks(np.arange(1990,2101,30),map(str,np.arange(1990,2101,30)),size=6)
+        plt.xlim([1990,2090])   
+        plt.ylim([0,1])  
+    else:
+        ax.axes.yaxis.set_ticklabels([])
+        plt.xticks(np.arange(1990,2101,30),map(str,np.arange(1990,2101,30)),size=6)
+        plt.xlim([1990,2090])   
+        plt.ylim([0,1])  
+    
+    plt.text(2087,1.0,r'\textbf{[\#%s]}' % (r+1),ha='center',va='center',color='k',fontsize=6)
+fig.suptitle(r'\textbf{TESTING DATA BY ENSEMBLE MEMBER}',color='dimgrey',fontsize=20)
+     
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigure + 'TestingConfidence_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+    plt.savefig(directoryfigure + 'TestingConfidenceBAR_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
 else:
-    plt.savefig(directoryfigure + 'TestingConfidence_Hiatus_EDA-v1.png',dpi=300)
+    plt.savefig(directoryfigure + 'TestingConfidenceBAR_Hiatus_EDA-v1.png',dpi=300)
 
