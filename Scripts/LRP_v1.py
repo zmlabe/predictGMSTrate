@@ -37,7 +37,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 ###############################################################################
 ###############################################################################
 ### Original model
-def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,variq):
+def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,vari_predict):
     ### Directory of saved models
     dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
     
@@ -62,7 +62,7 @@ def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segmen
     model.add(Activation('softmax'))
     
     ### Add weights from compiled model
-    savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+    savename = 'ANNv2_'+vari_predict[0]+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
     if(rm_ensemble_mean==True):
         savename = savename + '_EnsembleMeanRemoved'  
     
@@ -72,10 +72,11 @@ def loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segmen
     return model
 
 ### Hyperparamters for files of the ANN model
-rm_ensemble_mean = False
+rm_ensemble_mean = True
 
 if rm_ensemble_mean == False:
     variq = 'T2M'
+    vari_predict = ['OHC100']
     fac = 0.8
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
@@ -89,6 +90,7 @@ if rm_ensemble_mean == False:
     yearsall = np.arange(1990,2099+1,1)
 elif rm_ensemble_mean == True:
     variq = 'T2M'
+    vari_predict = ['OHC100']
     fac = 0.8
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
@@ -106,7 +108,7 @@ else:
     
 ### Read in data
 directorymodel = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
-savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
+savename = 'ANNv2_'+vari_predict[0]+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
 if(rm_ensemble_mean==True):
     savename = savename + '_EnsembleMeanRemoved'  
 
@@ -129,7 +131,7 @@ input_shape=np.shape(Xtrain)[1]
 output_shape=np.shape(Ytrain)[1]
 
 ### Load model 
-model = loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,variq)
+model = loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,vari_predict)
 
 ##############################################################################
 ##############################################################################
