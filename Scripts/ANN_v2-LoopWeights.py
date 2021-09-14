@@ -1,8 +1,9 @@
 """
-Second version of ANN to test new ML model
+Second version of ANN to test new ML model. This ANN is used to loop through
+the class imbalance weights from 0 to 100% by increments of 10%
 
 Author     : Zachary M. Labe
-Date       : 13 September 2021
+Date       : 14 September 2021
 Version    : 2 (mostly for testing; now using validation data)
 """
 
@@ -19,7 +20,7 @@ import tensorflow.keras as keras
 import tensorflow.keras.layers as layers
 from tensorflow.keras.layers import Dense, Activation
 import calc_Stats as dSS
-from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score,recall_score,f1_score
+from sklearn.metrics import accuracy_score,precision_recall_fscore_support,precision_score,recall_score,f1_score
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -241,7 +242,7 @@ if readData == True:
 fac = 0.70 # 0.70 training, 0.15 validation, 0.15 for testing
 random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
 random_network_seed = 87750
-Xtrain,Ytrain,Xtest,Ytest,Xval,Yval,Xtrain_shape,Xtest_shape,Xval_shape,testIndices,trainIndices,valIndices,class_weight,random_segment_seed = FRAC.segment_data(models_slice,classes_mh,fac,random_segment_seed)
+Xtrain,Ytrain,Xtest,Ytest,Xval,Yval,Xtrain_shape,Xtest_shape,Xval_shape,testIndices,trainIndices,valIndices,class_weightinit,random_segment_seed = FRAC.segment_data(models_slice,classes_mh,fac,random_segment_seed)
 
 ### Model paramaters
 if rm_ensemble_mean == True:
@@ -252,7 +253,7 @@ if rm_ensemble_mean == True:
     lr_here = 0.001
     ridgePenalty = 0.5
     actFun = 'relu'
-    fractWeight = 0.5
+    fractWeight = np.arange(0.1,1.2,0.1)
     input_shape=np.shape(Xtrain)[1]
     output_shape=np.shape(Ytrain)[1]
     
@@ -294,12 +295,13 @@ else:
 ###############################################################################
 ###############################################################################
 ###############################################################################
-def loadmodel(Xtrain,Xval,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape,fractWeight):
+def loadmodel(Xtrain,Xval,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weightinit,input_shape,output_shape,fractWeight):
     print('----ANN Training: learning rate = '+str(lr_here)+'; activation = '+actFun+'; batch = '+str(batch_size) + '----')
     keras.backend.clear_session()
     model = keras.models.Sequential()
     
     ### Adjust class weights for too many hiatuses
+    class_weight = class_weightinit.copy()
     class_weight[1] = class_weight[1]*(fractWeight)
 
     ### Input layer
@@ -372,163 +374,158 @@ def loadmodel(Xtrain,Xval,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_
 XtrainS,XtestS,XvalS,stdVals = dSS.standardize_dataVal(Xtrain,Xtest,Xval)
 Xmean, Xstd = stdVals  
 
-###############################################################################
-### Compile neural network
-model,history = loadmodel(XtrainS,XvalS,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape,fractWeight)
+for lo in range(len(fractWeight)):
+# for lo in range(1):
+    ###############################################################################
+    ### Compile neural network
+    model,history = loadmodel(XtrainS,XvalS,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weightinit,input_shape,output_shape,fractWeight[lo])
+    
+    ###############################################################################
+    ### Actual hiatus
+    actual_classtrain = np.swapaxes(classes_mh,0,1)[trainIndices,:,:].ravel()
+    actual_classtest = np.swapaxes(classes_mh,0,1)[testIndices,:,:].ravel()
+    actual_classval = np.swapaxes(classes_mh,0,1)[valIndices,:,:].ravel()
+    actual_classtrain = np.asarray(actual_classtrain,dtype=int)
+    actual_classtest = np.asarray(actual_classtest,dtype=int)
+    actual_classval = np.asarray(actual_classval,dtype=int)
+    
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    ### Prediction for training/testing
+    ypred_train = model.predict(XtrainS,verbose=1)
+    ypred_picktrain = np.argmax(ypred_train,axis=1)
+    ypred_test = model.predict(XtestS,verbose=1)
+    ypred_picktest = np.argmax(ypred_test,axis=1)
+    
+    ### Prediction for validation
+    ypred_val = model.predict(XvalS,verbose=1)
+    ypred_pickval = np.argmax(ypred_val,axis=1)
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    
+    ###############################################################################
+    ### Count hiatuses
+    uniquetrain,counttrain = np.unique(ypred_picktrain,return_counts=True)
+    uniquetest,counttest = np.unique(ypred_picktest,return_counts=True)
+    actual_uniquetrain,actual_counttrain = np.unique(actual_classtrain,return_counts=True)
+    actual_uniquetest,actual_counttest = np.unique(actual_classtest,return_counts=True)
+    
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    ### Test observations
+    obsreshape = obs_slice.reshape(obs_slice.shape[0],obs_slice.shape[1]*obs_slice.shape[2])
+    Xmeanobs = np.nanmean(obsreshape,axis=0)
+    Xstdobs = np.nanstd(obsreshape,axis=0)  
+    XobsS = (obsreshape-Xmeanobs)/Xstdobs
+    XobsS[np.isnan(XobsS)] = 0.
+    
+    testobs = model.predict(XobsS,verbose=1)
+    selectobs = np.argmax(testobs,axis=1)
+    actualobs = np.array(classes_obsh,dtype=int)
 
-###############################################################################
-### Actual hiatus
-actual_classtrain = np.swapaxes(classes_mh,0,1)[trainIndices,:,:].ravel()
-actual_classtest = np.swapaxes(classes_mh,0,1)[testIndices,:,:].ravel()
-actual_classval = np.swapaxes(classes_mh,0,1)[valIndices,:,:].ravel()
-actual_classtrain = np.asarray(actual_classtrain,dtype=int)
-actual_classtest = np.asarray(actual_classtest,dtype=int)
-actual_classval = np.asarray(actual_classval,dtype=int)
-
-###############################################################################
-###############################################################################
-###############################################################################
-### Prediction for training/testing
-ypred_train = model.predict(XtrainS,verbose=1)
-ypred_picktrain = np.argmax(ypred_train,axis=1)
-ypred_test = model.predict(XtestS,verbose=1)
-ypred_picktest = np.argmax(ypred_test,axis=1)
-
-### Prediction for validation
-ypred_val = model.predict(XvalS,verbose=1)
-ypred_pickval = np.argmax(ypred_val,axis=1)
-###############################################################################
-###############################################################################
-###############################################################################
-
-###############################################################################
-### Count hiatuses
-uniquetrain,counttrain = np.unique(ypred_picktrain,return_counts=True)
-uniquetest,counttest = np.unique(ypred_picktest,return_counts=True)
-actual_uniquetrain,actual_counttrain = np.unique(actual_classtrain,return_counts=True)
-actual_uniquetest,actual_counttest = np.unique(actual_classtest,return_counts=True)
-
-###############################################################################
-###############################################################################
-###############################################################################
-### Test observations
-obsreshape = obs_slice.reshape(obs_slice.shape[0],obs_slice.shape[1]*obs_slice.shape[2])
-Xmeanobs = np.nanmean(obsreshape,axis=0)
-Xstdobs = np.nanstd(obsreshape,axis=0)  
-XobsS = (obsreshape-Xmeanobs)/Xstdobs
-XobsS[np.isnan(XobsS)] = 0.
-
-testobs = model.predict(XobsS,verbose=1)
-selectobs = np.argmax(testobs,axis=1)
-actualobs = np.array(classes_obsh,dtype=int)
-###############################################################################
-###############################################################################
-###############################################################################
-
-###############################################################################
-### Quick analyze obs
-plt.figure()
-plt.plot(selectobs,alpha=0.5,linewidth=2,label='predicted hiatus obs')
-plt.plot(actualobs,alpha=0.5,linewidth=2,label='actual hiatus obs')
-plt.xlabel('years')
-plt.ylabel('hiatus=1')
-plt.legend()
-
-###############################################################################
-###############################################################################
-###############################################################################
-### Start saving everything, including the ANN
-dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
-savename = 'ANNv2_'+vari_predict[0]+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
-
-if(rm_ensemble_mean==True):
-    savename = savename + '_EnsembleMeanRemoved'  
-modelwrite = dirname + savename + '.h5'
-model.save_weights(modelwrite)
-np.savez(dirname + savename + '.npz',trainModels=trainIndices,testModels=testIndices,Xtrain=Xtrain,Ytrain=Ytrain,Xtest=Xtest,Ytest=Ytest,Xmean=Xmean,Xstd=Xstd,lats=lats,lons=lons,XobsS=XobsS)
-
-###############################################################################
-###############################################################################
-###############################################################################
-### Observations saving output
-directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
-np.savetxt(directoryoutput + 'obsLabels_' + savename + '.txt',selectobs)
-np.savetxt(directoryoutput + 'obsActualLabels_' + savename + '.txt',actualobs)
-np.savetxt(directoryoutput + 'obsConfid_' + savename + '.txt',testobs)
-
-## Training/testing for saving output
-np.savetxt(directoryoutput + 'trainingEnsIndices_' + savename + '.txt',trainIndices)
-np.savetxt(directoryoutput + 'testingEnsIndices_' + savename + '.txt',testIndices)
-np.savetxt(directoryoutput + 'validationEnsIndices_' + savename + '.txt',valIndices)
-
-np.savetxt(directoryoutput + 'trainingTrueLabels_' + savename + '.txt',actual_classtrain)
-np.savetxt(directoryoutput + 'testingTrueLabels_' + savename + '.txt',actual_classtest)
-np.savetxt(directoryoutput + 'validationTrueLabels_' + savename + '.txt',actual_classval)
-
-np.savetxt(directoryoutput + 'trainingPredictedLabels_' + savename + '.txt',ypred_picktrain)
-np.savetxt(directoryoutput + 'trainingPredictedConfidence_' + savename+ '.txt',ypred_train)
-np.savetxt(directoryoutput + 'testingPredictedLabels_' + savename+ '.txt',ypred_picktest)
-np.savetxt(directoryoutput + 'testingPredictedConfidence_' + savename+ '.txt',ypred_test)
-np.savetxt(directoryoutput + 'validationPredictedLabels_' + savename+ '.txt',ypred_pickval)
-np.savetxt(directoryoutput + 'validationPredictedConfidence_' + savename+ '.txt',ypred_val)
-
-###############################################################################
-###############################################################################
-###############################################################################
-### Calculate accuracy statistics
-def accuracyTotalTime(data_pred,data_true):
-    """
-    Compute accuracy for the entire time series
-    """  
-    data_truer = data_true
-    data_predr = data_pred
-    accdata_pred = accuracy_score(data_truer,data_predr)
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    ### Start saving everything, including the ANN
+    dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
+    directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/LoopWeights/'
+    savename = 'ANNv2_'+vari_predict[0]+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) + '_fracWeights' + str(np.round(fractWeight[lo],2)) + '_%s' % lo 
+    
+    if(rm_ensemble_mean==True):
+        savename = savename + '_EnsembleMeanRemoved'  
+    
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    ### Calculate accuracy statistics
+    def accuracyTotalTime(data_pred,data_true):
+        """
+        Compute accuracy for the entire time series
+        """  
+        data_truer = data_true
+        data_predr = data_pred
+        accdata_pred = accuracy_score(data_truer,data_predr)
+            
+        return accdata_pred
+    
+    def precisionTotalTime(data_pred,data_true):
+        """
+        Compute precision for the entire time series
+        """
+        data_truer = data_true
+        data_predr = data_pred
+        precdata_pred = precision_score(data_truer,data_predr)
         
-    return accdata_pred
-
-def precisionTotalTime(data_pred,data_true):
-    """
-    Compute precision for the entire time series
-    """
-    data_truer = data_true
-    data_predr = data_pred
-    precdata_pred = precision_score(data_truer,data_predr)
+        return precdata_pred
     
-    return precdata_pred
-
-def recallTotalTime(data_pred,data_true):
-    """
-    Compute recall for the entire time series
-    """
-    data_truer = data_true
-    data_predr = data_pred
-    recalldata_pred = recall_score(data_truer,data_predr)
+    def recallTotalTime(data_pred,data_true):
+        """
+        Compute recall for the entire time series
+        """
+        data_truer = data_true
+        data_predr = data_pred
+        recalldata_pred = recall_score(data_truer,data_predr)
+        
+        return recalldata_pred
     
-    return recalldata_pred
-
-def f1TotalTime(data_pred,data_true):
-    """
-    Compute f1 for the entire time series
-    """
-    data_truer = data_true
-    data_predr = data_pred
-    f1data_pred = f1_score(data_truer,data_predr)
+    def f1TotalTime(data_pred,data_true):
+        """
+        Compute f1 for the entire time series
+        """
+        data_truer = data_true
+        data_predr = data_pred
+        f1data_pred = f1_score(data_truer,data_predr)
+        
+        return f1data_pred
     
-    return f1data_pred
+    acctrain = accuracyTotalTime(ypred_picktrain,actual_classtrain)     
+    acctest = accuracyTotalTime(ypred_picktest,actual_classtest)
+    accval = accuracyTotalTime(ypred_pickval,actual_classval)
+    
+    prectrain = precisionTotalTime(ypred_picktrain,actual_classtrain)     
+    prectest = precisionTotalTime(ypred_picktest,actual_classtest)
+    precval = precisionTotalTime(ypred_pickval,actual_classval)
+    
+    recalltrain = recallTotalTime(ypred_picktrain,actual_classtrain)     
+    recalltest = recallTotalTime(ypred_picktest,actual_classtest)
+    recallval = recallTotalTime(ypred_pickval,actual_classval)
+    
+    f1_train = f1TotalTime(ypred_picktrain,actual_classtrain)     
+    f1_test = f1TotalTime(ypred_picktest,actual_classtest)
+    f1_val = f1TotalTime(ypred_pickval,actual_classval)
+    
+    ### Save metrics
+    np.savez(directoryoutput + 'scores/metrics_LoopWeights_%s.npz' % (savename),
+             acctrain=acctrain,acctest=acctest,accval=accval,
+             prectrain=prectrain,prectest=prectest,precval=precval,
+             recalltrain=recalltrain,recalltest=recalltest,recallval=recallval,
+             f1_train=f1_train,f1_test=f1_test,f1_val=f1_val)
 
-acctrain = accuracyTotalTime(ypred_picktrain,actual_classtrain)     
-acctest = accuracyTotalTime(ypred_picktest,actual_classtest)
-accval = accuracyTotalTime(ypred_pickval,actual_classval)
-
-prectrain = precisionTotalTime(ypred_picktrain,actual_classtrain)     
-prectest = precisionTotalTime(ypred_picktest,actual_classtest)
-precval = precisionTotalTime(ypred_pickval,actual_classval)
-
-recalltrain = recallTotalTime(ypred_picktrain,actual_classtrain)     
-recalltest = recallTotalTime(ypred_picktest,actual_classtest)
-recallval = recallTotalTime(ypred_pickval,actual_classval)
-
-f1_train = f1TotalTime(ypred_picktrain,actual_classtrain)     
-f1_test = f1TotalTime(ypred_picktest,actual_classtest)
-f1_val = f1TotalTime(ypred_pickval,actual_classval)
-print(acctest,prectest,recalltest,f1_test)
+    ###############################################################################
+    ###############################################################################
+    ###############################################################################
+    ### Observations saving output
+    np.savetxt(directoryoutput + 'obsLabels_' + savename + '.txt',selectobs)
+    np.savetxt(directoryoutput + 'obsActualLabels_' + savename + '.txt',actualobs)
+    np.savetxt(directoryoutput + 'obsConfid_' + savename + '.txt',testobs)
+    
+    ## Training/testing for saving output
+    np.savetxt(directoryoutput + 'trainingEnsIndices_' + savename + '.txt',trainIndices)
+    np.savetxt(directoryoutput + 'testingEnsIndices_' + savename + '.txt',testIndices)
+    np.savetxt(directoryoutput + 'validationEnsIndices_' + savename + '.txt',valIndices)
+    
+    np.savetxt(directoryoutput + 'trainingTrueLabels_' + savename + '.txt',actual_classtrain)
+    np.savetxt(directoryoutput + 'testingTrueLabels_' + savename + '.txt',actual_classtest)
+    np.savetxt(directoryoutput + 'testingTrueLabels_' + savename + '.txt',actual_classval)
+    
+    np.savetxt(directoryoutput + 'trainingPredictedLabels_' + savename + '.txt',ypred_picktrain)
+    np.savetxt(directoryoutput + 'trainingPredictedConfidence_' + savename+ '.txt',ypred_train)
+    np.savetxt(directoryoutput + 'testingPredictedLabels_' + savename+ '.txt',ypred_picktest)
+    np.savetxt(directoryoutput + 'testingPredictedConfidence_' + savename+ '.txt',ypred_test)
+    np.savetxt(directoryoutput + 'validationPredictedLabels_' + savename+ '.txt',ypred_pickval)
+    np.savetxt(directoryoutput + 'validationPredictedConfidence_' + savename+ '.txt',ypred_val)
+    
+    print(prectest,recalltest,f1_test)

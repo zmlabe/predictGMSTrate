@@ -1,11 +1,11 @@
 """
-First version of ANN to test new ML model - accompanying LRP script
+Second version of ANN to test new ML model - accompanying LRP script
 
 Notes      : Need to use older TF1.15 environment with innvestigate
 
 Author     : Zachary M. Labe
-Date       : 25 August 2021
-Version    : 1 (mostly for testing)
+Date       : 14 September 2021
+Version    : 2 (mostly for testing)
 """
 
 ### Import packages

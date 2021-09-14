@@ -94,7 +94,7 @@ def segment_data(data,classesl,fac,random_segment_seed):
     if fac < 1 :
         nrows = datanew.shape[0]
         segment_train = int(np.round(nrows * fac))
-        segment_test = int(np.round(nrows * 0.2))
+        segment_test = int(np.round(nrows * ((1-fac)/2)))
         segment_val = nrows - segment_train - segment_test
         print('--------------------------------------------------------------------')
         print('Training on',segment_train,'ensembles, Testing on',segment_test,'ensembles, Validation on',segment_val,'ensembles')
