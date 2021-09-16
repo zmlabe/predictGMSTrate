@@ -116,7 +116,7 @@ def remove_observations_mean(data,data_obs,lats,lons):
 
 ###############################################################################
 
-def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
+def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall,yearsobs):
     """
     Calculates anomalies for each model and observational data set. Note that
     it assumes the years at the moment
@@ -129,12 +129,13 @@ def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
     minyr = baseline.min()
     maxyr = baseline.max()
     yearq = np.where((yearsall >= minyr) & (yearsall <= maxyr))[0]
+    yearobsq = np.where((yearsobs >= minyr) & (yearsobs <= maxyr))[0]
     
     if data.ndim == 5:
         
         ### Slice years
         modelnew = data[:,:,yearq,:,:]
-        obsnew = data_obs[yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
         
         ### Average climatology
         meanmodel = np.nanmean(modelnew[:,:,:,:,:],axis=2)
@@ -143,8 +144,23 @@ def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
         ### Calculate anomalies
         modelanom = data[:,:,:,:,:] - meanmodel[:,:,np.newaxis,:,:]
         obsanom = data_obs[:,:,:] - meanobs[:,:]
+        
+    elif data.ndim == 4:
+        
+        ### Slice years
+        modelnew = data[:,yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
+        
+        ### Average climatology
+        meanmodel = np.nanmean(modelnew[:,:,:,:],axis=1)
+        meanobs = np.nanmean(obsnew,axis=0)
+        
+        ### Calculate anomalies
+        modelanom = data[:,:,:,:] - meanmodel[:,np.newaxis,:,:]
+        obsanom = data_obs[:,:,:] - meanobs[:,:]
+        
     else:
-        obsnew = data_obs[yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
         
         ### Average climatology
         meanobs = np.nanmean(obsnew,axis=0)

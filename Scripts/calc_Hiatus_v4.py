@@ -208,13 +208,13 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffB
             for hi in range(len(yearsnew)-trendlength+1):
                 yearstrend[e,hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
                 datatrend[e,hi,:] = data[e,hi:hi+trendlength]  
-         
+                
         ### Calculate trend lines
         linetrend = np.empty((ens,len(yearsnew)-trendlength+1,2))
         for e in range(ens):
             for hi in range(len(yearsnew)-trendlength+1):
                 linetrend[e,hi,:] = np.polyfit(yearstrend[e,hi],datatrend[e,hi],1)
-            
+        
         ### Count number of hiatus periods
         slope = linetrend[:,:,0]
 
