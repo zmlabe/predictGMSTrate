@@ -1,9 +1,9 @@
 """
-Script for calculating the PDO index in each ensemble member
+Script for calculating the IPO index in each ensemble member
 
 Author     : Zachary M. Labe
-Date       : 15 September 2021
-Version    : 1 
+Date       : 17 September 2021
+Version    : 12
 """
 
 ### Import packages
@@ -150,138 +150,108 @@ if rm_ensemble_mean == True:
 
 ###############################################################################  
 ###############################################################################  
-###############################################################################      
-### Calculate PDO
-# mean = UT.calc_weightedAve(models_var,lat2)
-# models_varRMmean = models_var - mean[:,:,np.newaxis,np.newaxis]    
-models_varRMmean = models_var    
-    
-latmin = 20 # slices for Pacific Ocean
-latmax = 60
-lonmin = 110
-lonmax = 260
-latq = np.where((lats >= latmin) & (lats <= latmax))[0]
-lonq = np.where((lons >= lonmin) & (lons <= lonmax))[0]
-latslice = lats[latq]
-lonslice = lons[lonq]
-models_var1 = models_varRMmean[:,:,latq,:]
-models_varss = models_var1[:,:,:,lonq]
+###############################################################################
+### Calculate SST regions
+region1 = models_var.copy() #  25°N–45°N, 140°E–145°W
+latr1 = np.where((lats >= 25) & (lats <= 45))[0]
+lonr1 = np.where((lons >= 140) & (lons <= (180+(180-145))))[0]
+latRegion1 = lats[latr1]
+lonRegion1 = lons[lonr1]
+lon2r1,lat2r1 = np.meshgrid(lonRegion1,latRegion1)
+sstregion1lat = region1[:,:,latr1,:]
+sstregion1 = sstregion1lat[:,:,:,lonr1]
+mean_r1 = UT.calc_weightedAve(sstregion1,lat2r1)
 
-vectorsst = models_varss.reshape(models_varss.shape[0],models_varss.shape[1],models_varss.shape[2]*models_varss.shape[3])
+region2 = models_var.copy() #  10°S–10°N, 170°E–90°W
+latr2 = np.where((lats >= -10) & (lats <= 10))[0]
+lonr2 = np.where((lons >= 170) & (lons <= (180+(180-90))))[0]
+latRegion2 = lats[latr2]
+lonRegion2 = lons[lonr2]
+lon2r2,lat2r2 = np.meshgrid(lonRegion2,latRegion2)
+sstregion2lat = region2[:,:,latr2,:]
+sstregion2 = sstregion2lat[:,:,:,lonr2]
+mean_r2 = UT.calc_weightedAve(sstregion2,lat2r2)
 
-### Mask out land
-mask = ~np.isnan(vectorsst[0,0,:])
+region3 = models_var.copy() #  50°S–15°S, 150°E–160°W
+latr3 = np.where((lats >= -50) & (lats <= -15))[0]
+lonr3 = np.where((lons >= 150) & (lons <= (180+(180-160))))[0]
+latRegion3 = lats[latr3]
+lonRegion3 = lons[lonr3]
+lon2r3,lat2r3 = np.meshgrid(lonRegion3,latRegion3)
+sstregion3lat = region3[:,:,latr3,:]
+sstregion3 = sstregion3lat[:,:,:,lonr3]
+mean_r3 = UT.calc_weightedAve(sstregion3,lat2r3)
 
-### Calculate PDO index for each ensemble member
-PDOindexz = np.empty((models_varss.shape[0],models_varss.shape[1]))
-PDOindexzWeighted = np.empty((models_varss.shape[0],models_varss.shape[1]))
-eof_patternWeighted = []
-for i in range(models_varss.shape[0]):
-    ensemblesst = vectorsst[i,:,:]
-    sstonly = ensemblesst[:,mask]
-    
-    ### Calculate EOF
-    covmat = np.cov(np.transpose(sstonly)) 
-    covsparse = sparse.csc_matrix(covmat) 
-    
-    evals, eof = linalg.eigs(covsparse,k=1) 
-    eof = np.real(eof) 
-    if eof[300]<0: # same sign of EOF pattern
-        eof = -1*eof 
-    
-    ### Plot EOF pattern
-    eofvec = np.empty(models_varss.shape[2]*models_varss.shape[3])
-    eofvec[np.argwhere(mask)] = eof
-    eofvec[np.argwhere(~mask)] = np.nan
-    eofmat = np.reshape(eofvec,(models_varss.shape[2],models_varss.shape[3]))
-    plt.figure()
-    plt.contourf(eofmat,cmap=cmocean.cm.balance,extend='both')
-    
-    ### Calculate PDO index from PCs
-    PDOindex = np.squeeze(np.matmul(sstonly,eof))
-    PDOindexz[i,:] = (PDOindex - np.mean(PDOindex))/np.std(PDOindex)
-    
-    ###########################################################################
-    ### Double check with EOFs package (weight latitudes)
-    ensemble = models_varss[i,:,:,:]
-    coslat = np.cos(np.deg2rad(latslice))
-    wgts = np.sqrt(coslat)[..., np.newaxis]
-    solver = Eof(ensemble, weights=wgts)
-    
-    eof1 = solver.eofsAsCovariance(neofs=1)
-    pcsave = solver.pcs(npcs=1, pcscaling=1)[:,0]
-    if eof1[0,18,38]<0: # same sign of EOF pattern
-        eof1 = -1*eof1 
-        pcsave = -1*pcsave
-    plt.contourf(eof1[0],cmap=cmocean.cm.balance,extend='both')
-    PDOindexzWeighted[i,:] = pcsave
-    eof_patternWeighted.append(eof1[0])
-    
-### Check for differences
-if any([np.max(PDOindexz-PDOindexzWeighted)>=0.5,np.min(PDOindexz-PDOindexzWeighted)<=-0.5]):
-    print(ValueError('SOMETHING IS WRONG WITH PDO INDEX'))
-    sys.exit()
-    
-### Save PDO index
-directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/PDO/'
-np.savetxt(directoryoutput + 'PDO_CESM2LE_1990-2099.txt',PDOindexzWeighted)
+###############################################################################
+### Calculate IPO
+IPOindex = mean_r2 - ((mean_r1 + mean_r3)/2)
+IPOindexz = (IPOindex - np.mean(IPOindex))/np.std(IPOindex)
 
-### Create composite of EOF patterns per each ensemble member
-eof_patternWeighted = np.asarray(eof_patternWeighted)
-meaneof = np.nanmean(eof_patternWeighted,axis=0)
+### Save IPO index
+directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/IPO/'
+np.savetxt(directoryoutput + 'IPO_CESM2LE_1990-2099.txt',IPOindexz )
 
 ###############################################################################
 ###############################################################################
-### Plot of pdo eof pattern
-letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
-if rm_ensemble_mean == False:
-    limit = np.arange(-0.5,0.51,0.02)
-    barlim = np.round(np.arange(-0.5,0.51,0.25),2)
-elif rm_ensemble_mean == True:
-    limit = np.arange(-0.5,0.51,0.02)
-    barlim = np.round(np.arange(-0.5,0.51,0.25),2)
-cmap = cmocean.cm.balance
-label = r'\textbf{SST -- [ PDO COMPOSITE ] -- CESM2-LE}'
-
-fig = plt.figure(figsize=(10,5))
 ###############################################################################
-ax1 = plt.subplot(111)
-# m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
-# m = Basemap(projection='lcc', resolution='l',lat_1=20,lat_2=60,lat_0=50,lon_0=-107.)
-m = Basemap(llcrnrlon=110, llcrnrlat=22, urcrnrlon=260, urcrnrlat=59.5, resolution='l', 
-    area_thresh=10000.,projection='merc')
-m.drawcoastlines(color='darkgrey',linewidth=0.7)
+###############################################################################
+### Read in PDO index
+directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
+PDO = np.genfromtxt(directorydata + '/PDO/PDO_CESM2LE_1990-2099.txt',unpack=True).transpose()
+
+###############################################################################
+### Compare PDO and IPO correlations
+corr = np.empty((models_var.shape[0]))
+p = np.empty((models_var.shape[0]))
+for i in range(models_var.shape[0]):
+    corr[i],p[i] = sts.pearsonr(IPOindexz[i],PDO[i])
     
-### Variable
-varn = meaneof
-   
-circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
-                  linewidth=0.7)
-circle.set_clip_on(False)
-
-lon2slice,lat2slice = np.meshgrid(lonslice,latslice)
-cs1 = m.contourf(lon2slice,lat2slice,varn,limit,extend='both',latlon=True)
-cs1.set_cmap(cmap) 
-m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-        
-# ax1.annotate(r'\textbf{[%s]}' % letters[0],xy=(0,0),xytext=(0.93,0.89),
-#               textcoords='axes fraction',color='k',fontsize=15,
-#               rotation=0,ha='center',va='center')
-
 ###############################################################################
-cbar_ax1 = fig.add_axes([0.35,0.08,0.3,0.04])                
-cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
-                    extend='both',extendfrac=0.07,drawedges=False)
-cbar1.set_label(label,fontsize=12,color='dimgrey',labelpad=4)  
-# cbar1.set_ticks(barlim)
-# cbar1.set_ticklabels(list(map(str,barlim)))
-cbar1.set_ticks([])
-cbar1.set_ticklabels([])
-cbar1.ax.tick_params(axis='x', size=.01,labelsize=4)
-cbar1.outline.set_edgecolor('dimgrey')
+###############################################################################
+###############################################################################
+### Create plot of correlations for the ensembles
+fig = plt.figure()
+ax = plt.subplot(111)
 
-plt.tight_layout()
-if rm_ensemble_mean == True:
-    plt.savefig(directoryfigure + 'EOFpattern_meanCESMensembles_rmENSEMBLEmean.png',dpi=300)
-else:
-    plt.savefig(directoryfigure + 'EOFpattern_meanCESMensembles.png',dpi=300)
+def adjust_spines(ax, spines):
+    for loc, spine in ax.spines.items():
+        if loc in spines:
+            spine.set_position(('outward', 5))
+        else:
+            spine.set_color('none')  
+    if 'left' in spines:
+        ax.yaxis.set_ticks_position('left')
+    else:
+        ax.yaxis.set_ticks([])
+
+    if 'bottom' in spines:
+        ax.xaxis.set_ticks_position('bottom')
+    else:
+        ax.xaxis.set_ticks([])
+
+adjust_spines(ax, ['left', 'bottom'])
+ax.spines['top'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.spines['left'].set_color('dimgrey')
+ax.spines['bottom'].set_color('dimgrey')
+ax.spines['left'].set_linewidth(2)
+ax.spines['bottom'].set_linewidth(2)
+ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+ax.tick_params(axis='x',labelsize=7,pad=4)
+ax.tick_params(axis='y',labelsize=7,pad=4)
+ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35,clip_on=False)
+
+plt.plot(corr,color='maroon',linewidth=3,clip_on=False,alpha=1,
+         marker='o',markersize=7,zorder=10)
+
+plt.xlabel(r'\textbf{CESM2-LE Ensemble Member \#}',fontsize=8,color='dimgrey')
+plt.ylabel(r'\textbf{IPO \& PDO: Correlation Coefficient}',fontsize=8,color='dimgrey')
+plt.yticks(np.arange(0,1.1,0.1),map(str,np.round(np.arange(0,1.1,0.1),2)))
+plt.xticks(np.arange(0,39+1,3),map(str,np.arange(1,40+1,3)))
+plt.xlim([0,39])   
+plt.ylim([0,1])
+
+plt.subplots_adjust(bottom=0.15)
+plt.savefig(directoryfigure + 'IPO-PDO_CorrelationCESM2le.png',
+            dpi=600)
+                 

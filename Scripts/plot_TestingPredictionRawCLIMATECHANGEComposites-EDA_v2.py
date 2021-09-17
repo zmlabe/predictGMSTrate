@@ -268,22 +268,19 @@ label = r'\textbf{%s - [ CLIMATE CHANGE COMPOSITE ]}' % vari_predict[0]
 fig = plt.figure()
 ###############################################################################
 ax1 = plt.subplot(111)
-m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+m = Basemap(projection='moll',lon_0=-180,resolution='l',area_thresh=10000)
 m.drawcoastlines(color='darkgrey',linewidth=0.27)
     
 ### Variable
 varn = ohcHIATUS
-
-var, lons_cyclic = addcyclic(varn, lons)
-var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-x, y = m(lon2d, lat2d)
+lons = np.where(lons >180,lons-360,lons)
+x, y = np.meshgrid(lons,lats)
    
 circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
                   linewidth=0.7)
 circle.set_clip_on(False)
 
-cs1 = m.contourf(x,y,var,limit,extend='both')
+cs1 = m.contourf(x,y,varn,limit,extend='both',latlon=True)
 cs1.set_cmap(cmap) 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
         

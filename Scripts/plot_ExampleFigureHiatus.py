@@ -161,7 +161,9 @@ ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
 ax.tick_params(axis='x',labelsize=7,pad=4)
 ax.tick_params(axis='y',labelsize=7,pad=4)
 
-ax.fill_between(yearsall,minens[:],maxens[:],facecolor='dimgrey',alpha=0.25,zorder=1)
+ax.fill_between(yearsall[11:112],minens[11:112],
+                maxens[11:112],facecolor='dimgrey',
+                alpha=0.25,zorder=1,clip_on=False)
 
 plt.plot(yearsall,modelsm.squeeze()[exampleens],color='teal',linewidth=3,alpha=1)
 plt.plot(yearsobs,obsm,color='k',alpha=1,linewidth=4,linestyle='-')
@@ -174,7 +176,7 @@ yearhiatusq = np.where((yearsall>=AGWstart) & (yearsall<=2090))[0]
 yearsallhiatus = yearsall[yearhiatusq]
 classes_mhplot = classes_mh.copy().ravel()
 wherehiatus = np.where(classes_mhplot == 1)
-classes_mhplot[wherehiatus] = -1
+classes_mhplot[wherehiatus] = -0.5
 classes_mhplot[np.where(classes_mhplot==0)] = np.nan
 classes_mhplot = classes_mhplot.reshape(classes_mh.shape)
 plt.plot(yearsallhiatus,classes_mhplot[exampleens,:],color='crimson',marker='o',clip_on=False,
@@ -193,7 +195,7 @@ plt.ylabel(r'\textbf{GMST Anomaly [$^{\circ}$C]}',fontsize=10,color='k',labelpad
 plt.yticks(np.arange(-5,21,0.5),map(str,np.round(np.arange(-5,21,0.5),2)),size=9)
 plt.xticks(np.arange(1850,2100+1,10),map(str,np.arange(1850,2100+1,10)),size=9)
 plt.xlim([1990,2090])   
-plt.ylim([-1,4])
+plt.ylim([-0.5,4])
 
 ##############################################################################
 ##############################################################################
@@ -213,7 +215,7 @@ ax.tick_params(axis='y',labelsize=7,pad=4)
 plt.plot(timetrend_m.transpose(),color='dimgrey',linewidth=0.4,alpha=0.45,clip_on=False)
 plt.plot(np.nanmean(timetrend_m,axis=0),color='dimgrey',linewidth=3,alpha=1,clip_on=False,
          label=r'\textbf{CESM2-LE MEAN}')
-plt.plot(timetrend_m[exampleens,:],color='teal',linewidth=1.2,alpha=1,clip_on=False)
+plt.plot(timetrend_m[exampleens,:],color='teal',linewidth=3,alpha=1,clip_on=False)
 plt.plot(timetrend_o,color='k',linewidth=4,alpha=1,clip_on=False,
          linestyle='-',label=r'\textbf{ERA5}')
 
