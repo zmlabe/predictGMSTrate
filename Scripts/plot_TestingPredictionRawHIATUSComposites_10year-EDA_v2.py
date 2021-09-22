@@ -129,19 +129,19 @@ for i in range(len(modelGCMs)):
 models_var = np.asarray(models_var)
 obs_var = np.asarray(obs_var).squeeze()
 
-### Standardize
-models_varravel = models_var.squeeze().reshape(numOfEns*yearsall.shape[0],lats.shape[0]*lons.shape[0])
-meanvar = np.nanmean(models_varravel,axis=0)
-stdvar = np.nanstd(models_varravel,axis=0)
-modelsstd_varravel = (models_varravel-meanvar)/stdvar
-models_var = modelsstd_varravel.reshape(len(modelGCMs),numOfEns,yearsall.shape[0],lats.shape[0],lons.shape[0])
-
 ### Remove ensemble mean
 if rm_ensemble_mean == True:
     models_var = dSS.remove_ensemble_mean(models_var,ravel_modelens,
                                           ravelmodeltime,rm_standard_dev,
                                           numOfEns)
     print('\n*Removed ensemble mean*')
+
+### Standardize
+models_varravel = models_var.squeeze().reshape(numOfEns*yearsall.shape[0],lats.shape[0]*lons.shape[0])
+meanvar = np.nanmean(models_varravel,axis=0)
+stdvar = np.nanstd(models_varravel,axis=0)
+modelsstd_varravel = (models_varravel-meanvar)/stdvar
+models_var = modelsstd_varravel.reshape(len(modelGCMs),numOfEns,yearsall.shape[0],lats.shape[0],lons.shape[0])
     
 ### Slice for number of years
 yearsq_m = np.where((yearsall >= AGWstart))[0]

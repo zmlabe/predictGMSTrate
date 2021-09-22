@@ -25,8 +25,8 @@ plt.rc('text',usetex=True)
 plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 
 ### Parameters FOR THIS SCRIPT
-accurateR = True
-accurateH = True
+accurateR = 'WRONG'
+accurateH = 'WRONG'
 
 ### Hyperparamters for files of the ANN model
 rm_ensemble_mean = True
@@ -413,3 +413,43 @@ if rm_ensemble_mean == True:
     plt.savefig(directoryfigure + 'LRP-EDA_Observations_v2_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (accurateH,accurateR),dpi=300)
 else:
     plt.savefig(directoryfigure + 'LRP-EDA_Observations_v2_AccH-%s_AccR-%s.png' % (accurateH,accurateR),dpi=300)
+    
+##############################################################################
+##############################################################################
+##############################################################################
+def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
+    print('\n>>> Using netcdfLRP function!')
+    
+    from netCDF4 import Dataset
+    import numpy as np
+    
+    name = 'LRP_comp/LRPMap_comp_' + typemodel + '_' + saveData + '.nc'
+    filename = directory + name
+    ncfile = Dataset(filename,'w',format='NETCDF4')
+    ncfile.description = 'LRP maps for using selected seed' 
+    
+    ### Dimensions
+    ncfile.createDimension('lat',var.shape[0])
+    ncfile.createDimension('lon',var.shape[1])
+    
+    ### Variables
+    latitude = ncfile.createVariable('lat','f4',('lat'))
+    longitude = ncfile.createVariable('lon','f4',('lon'))
+    varns = ncfile.createVariable('LRP','f4',('lat','lon'))
+    
+    ### Units
+    varns.units = 'unitless relevance'
+    ncfile.title = 'LRP relevance'
+    ncfile.instituion = 'Colorado State University'
+    ncfile.references = 'Barnes et al. [2020]'
+    
+    ### Data
+    latitude[:] = lats
+    longitude[:] = lons
+    varns[:] = var
+    
+    ncfile.close()
+    print('*Completed: Created netCDF4 File!')
+    
+netcdfLRP(lat,lon,hiatuslrpm,directorydata,'wronghiatus',savename)
+netcdfLRP(lat,lon,hiatuslrpmobs,directorydata,'wronghiatus_obs',savename)

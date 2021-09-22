@@ -20,7 +20,7 @@ import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score
+from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score,recall_score
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -126,6 +126,16 @@ def precisionTotalTime(data_pred,data_true):
     
     return precdata_pred
 
+def recallTotalTime(data_pred,data_true):
+    """
+    Compute recall for the entire time series
+    """
+    data_truer = data_true
+    data_predr = data_pred
+    recalldata_pred = recall_score(data_truer,data_predr)
+    
+    return recalldata_pred
+
 acctrain = accuracyTotalTime(predict_train,actual_train)     
 acctest = accuracyTotalTime(predict_test,actual_test)
 print('Accuracy Training == ',np.round(acctrain,3))
@@ -133,6 +143,9 @@ print('Accuracy Testing == ',np.round(acctest,3))
 
 prectrain = precisionTotalTime(predict_train,actual_train)     
 prectest = precisionTotalTime(predict_test,actual_test)
+
+recalltrain = recallTotalTime(predict_train,actual_train)     
+recalltest = recallTotalTime(predict_test,actual_test)
 
 ###############################################################################
 ###############################################################################
@@ -196,12 +209,13 @@ for i in range(plot_cmtrain.shape[0]):
     for j in range(plot_cmtrain.shape[1]):          
         plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtrain[i,j],fontsize=50,
             color='crimson',va='center',ha='center')
-        plt.text(j+0.5,i+0.34,r'\textbf{ %s \%% }' % (np.round(plot_cmtrainNORM[i,j]*100,1)),fontsize=10,
+        plt.text(j+0.5,i+0.34,r'\textbf{Recall = %s \%% }' % (np.round(plot_cmtrainNORM[i,j]*100,1)),fontsize=10,
             color='dimgrey',va='center',ha='center')
-        plt.text(j+0.5,i+0.29,r'\textbf{ %s \%% }' % (np.round(plot_cmtrainPRED[i,j]*100,1)),fontsize=10,
+        plt.text(j+0.5,i+0.29,r'\textbf{Precision =  %s \%% }' % (np.round(plot_cmtrainPRED[i,j]*100,1)),fontsize=10,
             color='k',va='center',ha='center')
-        plt.text(j+0.5,i+0.24,r'\textbf{[ %s \%% ]}' % (baseline_train[i,j]),fontsize=10,
-            color='crimson',va='center',ha='center',alpha=0.5)
+        if any([(i==0) & (j==1),(i==1) & (j==0)]):
+            plt.text(j+0.5,i+0.24,r'\textbf{[ %s \%% ]}' % (baseline_train[i,j]),fontsize=10,
+                color='crimson',va='center',ha='center',alpha=0.5)
         
 plt.text(1,-0.04,r'\textbf{PREDICTED}',color='k',fontsize=10,ha='center',
          va='center')
@@ -214,8 +228,8 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TRAINING [Accuracy = %s \%%, Precision = %s \%%]}' % ((np.round(acctrain,3)*100),
-               (np.round(prectrain,3)*100)),color='k',labelpad=10,fontsize=20)
+cbar.set_label(r'\textbf{TRAINING [Accuracy = %s \%%, Recall = %s \%%, Precision = %s \%%]}' % ((np.round(acctrain,3)*100),(np.round(recalltrain,3)*100),
+               (np.round(prectrain,3)*100)),color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
@@ -285,9 +299,9 @@ for i in range(plot_cmtest.shape[0]):
     for j in range(plot_cmtest.shape[1]):          
         plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtest[i,j],fontsize=50,
             color='crimson',va='center',ha='center')
-        plt.text(j+0.5,i+0.34,r'\textbf{ %s \%% }' % (np.round(plot_cmtestNORM[i,j]*100,1)),fontsize=10,
+        plt.text(j+0.5,i+0.34,r'\textbf{Recall = %s \%% }' % (np.round(plot_cmtestNORM[i,j]*100,1)),fontsize=10,
             color='dimgrey',va='center',ha='center')
-        plt.text(j+0.5,i+0.29,r'\textbf{ %s \%% }' % (np.round(plot_cmtestPRED[i,j]*100,1)),fontsize=10,
+        plt.text(j+0.5,i+0.29,r'\textbf{Precision = %s \%% }' % (np.round(plot_cmtestPRED[i,j]*100,1)),fontsize=10,
             color='k',va='center',ha='center')
         if any([(i==0) & (j==1),(i==1) & (j==0)]):
             plt.text(j+0.5,i+0.24,r'\textbf{[ %s \%% ]}' % (baseline_test[i,j]),fontsize=10,
@@ -304,8 +318,8 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TESTING [Accuracy = %s \%%, Precision = %s \%%]}' % ((np.round(acctest,3)*100),
-               (np.round(prectest*100,1))),color='k',labelpad=10,fontsize=20)
+cbar.set_label(r'\textbf{TESTING [Accuracy = %s \%%, Recall = %s \%%, Precision = %s \%%]}' % ((np.round(acctest,3)*100),(np.round(recalltest,3)*100),
+               (np.round(prectest*100,1))),color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
