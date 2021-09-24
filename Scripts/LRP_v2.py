@@ -131,7 +131,7 @@ input_shape=np.shape(Xtrain)[1]
 output_shape=np.shape(Ytrain)[1]
 
 ### Load model 
-model = loadmodel(Xtrain,Xtest,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,vari_predict)
+model = loadmodel(XtrainS,XtestS,Ytrain,Ytest,hidden,random_network_seed,random_segment_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,input_shape,output_shape,vari_predict)
 
 ##############################################################################
 ##############################################################################
