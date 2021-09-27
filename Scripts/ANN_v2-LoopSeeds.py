@@ -89,7 +89,7 @@ rm_ensemble_mean = True
 ###############################################################################
 ### Read in model and observational/reanalysis data and loop through seeds
 readData = True
-COUNTER = 2
+COUNTER = 100
 
 ###############################################################################
 random_network_seedall = []
@@ -435,7 +435,7 @@ for looo in range(COUNTER):
     ###############################################################################
     ### Observations saving output
     directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/LoopSeeds/'
-    np.savez(dirname + savename + '_PREDICTIONS_%s.npz' % looo,selectobs=selectobs,actualobs=actualobs,trainIndices=trainIndices,testIndices=testIndices,valIndices=valIndices,
+    np.savez(directoryoutput + savename + '_PREDICTIONS_%s.npz' % looo,selectobs=selectobs,actualobs=actualobs,trainIndices=trainIndices,testIndices=testIndices,valIndices=valIndices,
              actual_classtrain=actual_classtrain,actual_classtest=actual_classtest,actual_classval=actual_classval,
              ypred_picktrain=ypred_picktrain,ypred_train=ypred_train,ypred_picktest=ypred_picktest,
              ypred_test=ypred_test,ypred_pickval=ypred_pickval,ypred_val=ypred_val)
@@ -501,7 +501,7 @@ for looo in range(COUNTER):
     f1_val = f1TotalTime(ypred_pickval,actual_classval)
     print(acctest,prectest,recalltest,f1_test)
     
-    np.savez(dirname + savename + '_SCORES_%s.npz' % looo,
+    np.savez(directoryoutput + savename + '_SCORES_%s.npz' % looo,
              acctrain=acctrain,acctest=acctest,accval=accval,
              prectrain=prectrain,prectest=prectest,
              precval=precval,recalltrain=recalltrain,
@@ -511,9 +511,9 @@ for looo in range(COUNTER):
     random_network_seedall.append(random_network_seed)
     random_segment_seedall.append(random_segment_seed)
     savenamesall.append([savename])
-    print('<<<<<<<<< %s ITERATION >>>>>>>>>>' % looo+1)
+    print('\n\n\n<<<<<<<<< %s ITERATION >>>>>>>>>>\n\n\n' % (looo+1))
     
 ### Save seeds
-np.savez(dirname + savename + '_SEEDS.npz',random_network_seedall=np.asarray(random_network_seedall),
+np.savez(directoryoutput + 'LoopSeedsResultsfor_ANNv2_OHC100_hiatus_EnsembleMeanRemoved_SEEDS.npz',random_network_seedall=np.asarray(random_network_seedall),
          random_segment_seedall=np.asarray(random_segment_seedall),
          savenamesall=np.asarray(savenamesall))

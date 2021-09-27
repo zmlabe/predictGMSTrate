@@ -143,7 +143,7 @@ plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1),2)),si
 plt.yticks(np.arange(0,101,10),map(str,np.arange(0,101,10)),size=6)
 plt.xlim([0.1,1.1])   
 plt.ylim([0,100])
-plt.ylabel(r'\textbf{Score \%}')
+plt.ylabel(r'\textbf{Score [\%]}')
 plt.text(1.11,2,r'\textbf{ACCURACY}',fontsize=18,color='dimgrey',
          ha='right')
 
