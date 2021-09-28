@@ -31,6 +31,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 rm_ensemble_mean = True
 lengthOfWeightTests = 11
 directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Scores/'
+letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 
 acc_trainl = np.zeros((lengthOfWeightTests))
 acc_testl = np.zeros((lengthOfWeightTests))
@@ -146,6 +147,7 @@ plt.ylim([0,100])
 plt.ylabel(r'\textbf{Score [\%]}')
 plt.text(1.11,2,r'\textbf{ACCURACY}',fontsize=18,color='dimgrey',
          ha='right')
+plt.text(1.0,93,r'\textbf{[%s]}' % letters[0],color='k',fontsize=9)
 
 ###############################################################################
 ###############################################################################
@@ -171,6 +173,7 @@ plt.ylim([0,100])
 plt.text(0.73,-13,r'\textbf{Fraction of Class Weights on Hiatus}',fontsize=7,color='k')
 plt.text(1.11,2,r'\textbf{PRECISION}',fontsize=18,color='dimgrey',
          ha='right')
+plt.text(1.0,93,r'\textbf{[%s]}' % letters[1],color='k',fontsize=9)
 
 leg = plt.legend(shadow=False,fontsize=11,loc='upper center',
               bbox_to_anchor=(1.08,1.14),fancybox=True,ncol=4,frameon=False,
@@ -201,6 +204,7 @@ plt.xlim([0.1,1.1])
 plt.ylim([0,100])
 plt.text(1.11,2,r'\textbf{RECALL}',fontsize=18,color='dimgrey',
          ha='right')
+plt.text(1.0,93,r'\textbf{[%s]}' % letters[2],color='k',fontsize=9)
 
 ###############################################################################
 ###############################################################################
@@ -225,6 +229,7 @@ plt.xlim([0.1,1.1])
 plt.ylim([0,100])
 plt.text(1.11,2,r'\textbf{F1-SCORE}',fontsize=18,color='dimgrey',
          ha='right')
+plt.text(1.0,93,r'\textbf{[%s]}' % letters[3],color='k',fontsize=9)
 
 if rm_ensemble_mean == True:
     plt.savefig(directoryfigure + 'ValidationScores-LoopWeights_Hiatus_EDA-v2_rmENSEMBLEmean.png',dpi=300)
