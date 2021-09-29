@@ -2,8 +2,8 @@
 Explore raw composites based on indices from predicted testing data
 
 Author     : Zachary M. Labe
-Date       : 9 September 2021
-Version    : 1 (mostly for testing)
+Date       : 29 September 2021
+Version    : 2 (mostly for testing)
 """
 
 ### Import packages
@@ -80,8 +80,8 @@ lensalso = True
 rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
-### Accuracy for composites
-accurate = True
+### Experiment for composites
+nonlinear = 'diff_HIGHposIPO_actual'
 ###############################################################################
 ###############################################################################
 ### Call functions
@@ -93,7 +93,7 @@ vv = 0
 mo = 0
 variq = variables[vv]
 monthlychoice = monthlychoiceq[mo]
-directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v1/Raw/'
+directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Raw/'
 saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
 print('*Filename == < %s >' % saveData) 
 
@@ -147,11 +147,10 @@ models_var = modelsstd_varravel.reshape(len(modelGCMs),numOfEns,yearsall.shape[0
 yearsq_m = np.where((yearsall >= AGWstart))[0]
 yearsq_o = np.where((yearsobs >= AGWstart))[0]
 models_slice = models_var[:,:,yearsq_m,:,:]
-obs_slice = obs_var[yearsq_o,:,:]
 
 if rm_ensemble_mean == False:
     variq = 'T2M'
-    fac = 0.8
+    fac = 0.7
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
     hidden = [20,20]
@@ -161,29 +160,29 @@ if rm_ensemble_mean == False:
     ridgePenalty = 0.05
     actFun = 'relu'
     fractWeight = 0.5
-    yearsall = np.arange(1990,2099+1,1)
+    yearsall = np.arange(1990,2090+1,1)
 elif rm_ensemble_mean == True:
     variq = 'T2M'
-    fac = 0.8
+    fac = 0.7
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
     hidden = [30,30]
     n_epochs = 500
     batch_size = 128
     lr_here = 0.001
-    ridgePenalty = 0.35
+    ridgePenalty = 0.5
     actFun = 'relu'
     fractWeight = 0.5
-    yearsall = np.arange(1990,2099+1,1)
+    yearsall = np.arange(1990,2090+1,1)
 else:
     print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
     sys.exit()
 
 ### Naming conventions for files
 directorymodel = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
-savename = 'ANN_'+variq+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed)
+savename = 'ANNv2_'+'OHC100'+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
 if(rm_ensemble_mean==True):
-    savename = savename + '_EnsembleMeanRemoved'  
+    savename = savename + '_EnsembleMeanRemoved'   
     
 ### Directories to save files
 directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
@@ -201,86 +200,119 @@ act_re = np.swapaxes(actual_test.reshape(testindices.shape[0],1,yearsall.shape[0
 pre_re = np.swapaxes(predict_test.reshape(testindices.shape[0],1,yearsall.shape[0]),0,1).squeeze()
 
 ### Slice ensembles for testing data
-ohcready = models_var[:,testindices,:-11,:,:].squeeze()
+ohcready = models_slice[:,testindices,:act_re.shape[1],:,:].squeeze()
+
+### Read in IPO index
+IPO = np.genfromtxt(directorydata + '/IPO/IPO_CESM2LE_1990-2099.txt',unpack=True)
+IPOtest = IPO.transpose()[testindices,:yearsall.shape[0]]
 
 ### Pick all hiatuses
-if accurate == True: ### correct predictions
-    ohc_allenscomp = []
+if nonlinear == 'diff_posIPO': 
+    ohc_allenscomp_class = []
+    ohc_allenscomp_NOclass = []
     for ens in range(ohcready.shape[0]):
-        ohc_comp = []
+        ohc_comp_class = []
+        ohc_comp_NOclass = []
         for yr in range(ohcready.shape[1]):
-            if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 1):
-                ohc_comp.append(ohcready[ens,yr,:,:])
-        ohc_allenscomp.append(ohc_comp)
-elif accurate == False: ### picks all hiatus predictions
-    ohc_allenscomp = []
+            if (IPOtest[ens,yr] >= 0.5) and (pre_re[ens,yr] == 1):
+                ohc_comp_class.append(ohcready[ens,yr,:,:])
+            elif (IPOtest[ens,yr] >= 0.5) and (pre_re[ens,yr] == 0):
+                ohc_comp_NOclass.append(ohcready[ens,yr,:,:])
+        ohc_allenscomp_class.append(ohc_comp_class)
+        ohc_allenscomp_NOclass.append(ohc_comp_NOclass)
+elif nonlinear == 'diff_posIPO_actual': 
+    ohc_allenscomp_class = []
+    ohc_allenscomp_NOclass = []
     for ens in range(ohcready.shape[0]):
-        ohc_comp = []
+        ohc_comp_class = []
+        ohc_comp_NOclass = []
         for yr in range(ohcready.shape[1]):
-            if pre_re[ens,yr] == 1:
-                ohc_comp.append(ohcready[ens,yr,:,:])
-        ohc_allenscomp.append(ohc_comp)
-elif accurate == 'WRONG': ### picks hiatus but is wrong
-    ohc_allenscomp = []
+            if (IPOtest[ens,yr] >= 0.5) and (act_re[ens,yr] == 1):
+                ohc_comp_class.append(ohcready[ens,yr,:,:])
+            elif (IPOtest[ens,yr] >= 0.5) and (act_re[ens,yr] == 0):
+                ohc_comp_NOclass.append(ohcready[ens,yr,:,:])
+        ohc_allenscomp_class.append(ohc_comp_class)
+        ohc_allenscomp_NOclass.append(ohc_comp_NOclass)
+if nonlinear == 'diff_HIGHposIPO': 
+    ohc_allenscomp_class = []
+    ohc_allenscomp_NOclass = []
     for ens in range(ohcready.shape[0]):
-        ohc_comp = []
+        ohc_comp_class = []
+        ohc_comp_NOclass = []
         for yr in range(ohcready.shape[1]):
-            if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 0):
-                ohc_comp.append(ohcready[ens,yr,:,:])
-        ohc_allenscomp.append(ohc_comp)
+            if (IPOtest[ens,yr] >= 1.5) and (pre_re[ens,yr] == 1):
+                ohc_comp_class.append(ohcready[ens,yr,:,:])
+            elif (IPOtest[ens,yr] >= 1.5) and (pre_re[ens,yr] == 0):
+                ohc_comp_NOclass.append(ohcready[ens,yr,:,:])
+        ohc_allenscomp_class.append(ohc_comp_class)
+        ohc_allenscomp_NOclass.append(ohc_comp_NOclass)
+elif nonlinear == 'diff_HIGHposIPO_actual': 
+    ohc_allenscomp_class = []
+    ohc_allenscomp_NOclass = []
+    for ens in range(ohcready.shape[0]):
+        ohc_comp_class = []
+        ohc_comp_NOclass = []
+        for yr in range(ohcready.shape[1]):
+            if (IPOtest[ens,yr] >= 1.5) and (act_re[ens,yr] == 1):
+                ohc_comp_class.append(ohcready[ens,yr,:,:])
+            elif (IPOtest[ens,yr] >= 1.5) and (act_re[ens,yr] == 0):
+                ohc_comp_NOclass.append(ohcready[ens,yr,:,:])
+        ohc_allenscomp_class.append(ohc_comp_class)
+        ohc_allenscomp_NOclass.append(ohc_comp_NOclass)
+
 else:
-    print(ValueError('SOMETHING IS WRONG WITH ACCURACY COMPOSITES!'))
+    print(ValueError('SOMETHING IS WRONG WITH NONLINEAR COMPOSITES!'))
     sys.exit()
     
-### Composite hiatuses for 8 ensembles
-meanOHCens = np.empty((len(testindices),lats.shape[0],lons.shape[0]))
-for i in range(len(ohc_allenscomp)):
-    if len(ohc_allenscomp) > 0:
-        meanOHCens[i,:,:] = np.nanmean(np.asarray(ohc_allenscomp[i]),axis=0)
+### Composite hiatuses for 6 ensembles
+meanOHCens_class = np.empty((len(testindices),lats.shape[0],lons.shape[0]))
+meanOHCens_NOclass = np.empty((len(testindices),lats.shape[0],lons.shape[0]))
+for i in range(len(ohc_allenscomp_class)):
+    if len(ohc_allenscomp_class) > 0:
+        meanOHCens_class[i,:,:] = np.nanmean(np.asarray(ohc_allenscomp_class[i]),axis=0)
+        meanOHCens_NOclass[i,:,:] = np.nanmean(np.asarray(ohc_allenscomp_NOclass[i]),axis=0)
     else:
-        meanOHCens[i,:,:] = np.nan
+        meanOHCens_class[i,:,:] = np.nan
+        meanOHCens_NOclass[i,:,:] = np.nan
         
 ### Composite across all ensembles to get hiatuses
-ohcHIATUS = np.nanmean(meanOHCens,axis=0)
+ohcHIATUS_class = np.nanmean(meanOHCens_class,axis=0)
+ohcHIATUS_NOclass = np.nanmean(meanOHCens_NOclass,axis=0)
+
+### Difference
+diff = ohcHIATUS_NOclass - ohcHIATUS_class
 
 ###############################################################################
 ###############################################################################
 ### Plot subplot of observations
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
 if rm_ensemble_mean == False:
-    limit = np.arange(-1.5,1.51,0.05)
-    barlim = np.round(np.arange(-1.5,1.6,0.5),2)
+    limit = np.arange(-1,1.01,0.01)
+    barlim = np.round(np.arange(-1,1.1,0.5),2)
 elif rm_ensemble_mean == True:
-    limit = np.arange(-0.25,0.26,0.01)
-    barlim = np.round(np.arange(-0.25,0.26,0.25),2)
+    limit = np.arange(-1,1.01,0.01)
+    barlim = np.round(np.arange(-1,1.1,0.5),2)
 cmap = cmocean.cm.balance
-label = r'\textbf{%s - [ HIATUS COMPOSITE ]}' % vari_predict[0]
+label = r'\textbf{%s - [ IPO-HIATUS DIFFERENCE ]}' % vari_predict[0]
 
 fig = plt.figure()
 ###############################################################################
 ax1 = plt.subplot(111)
-m = Basemap(projection='moll',lon_0=0,resolution='l',area_thresh=10000)
+m = Basemap(projection='robin',lon_0=-180,resolution='l',area_thresh=10000)
 m.drawcoastlines(color='darkgrey',linewidth=0.27)
     
 ### Variable
-varn = ohcHIATUS
-
-var, lons_cyclic = addcyclic(varn, lons)
-var, lons_cyclic = shiftgrid(180., var, lons_cyclic, start=False)
-lon2d, lat2d = np.meshgrid(lons_cyclic, lats)
-x, y = m(lon2d, lat2d)
+varn = diff
+lons = np.where(lons >180,lons-360,lons)
+x, y = np.meshgrid(lons,lats)
    
 circle = m.drawmapboundary(fill_color='dimgrey',color='dimgray',
                   linewidth=0.7)
 circle.set_clip_on(False)
 
-cs1 = m.contourf(x,y,var,limit,extend='both')
+cs1 = m.contourf(x,y,varn,limit,extend='both',latlon=True)
 cs1.set_cmap(cmap) 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-        
-ax1.annotate(r'\textbf{[%s]}' % letters[0],xy=(0,0),xytext=(0.93,0.89),
-              textcoords='axes fraction',color='k',fontsize=15,
-              rotation=0,ha='center',va='center')
 
 ###############################################################################
 cbar_ax1 = fig.add_axes([0.38,0.07,0.3,0.02])                
@@ -294,6 +326,6 @@ cbar1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigure + 'RawCompositesHiatus_v1_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (accurate,accurate),dpi=300)
+    plt.savefig(directoryfigure + 'RawCompositesHiatus-%s_v2_%s_rmENSEMBLEmean.png' % (vari_predict[0],nonlinear),dpi=300)
 else:
-    plt.savefig(directoryfigure + 'RawCompositesHiatus_v1_AccH-%s_AccR-%s.png' % (accurate,accurate),dpi=300)
+    plt.savefig(directoryfigure + 'RawCompositesHiatus-%s_v2_%s.png' % (vari_predict[0],nonlinear),dpi=300)
