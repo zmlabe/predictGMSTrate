@@ -85,8 +85,8 @@ freq_obs = countobs/COUNTER
 ###############################################################################
 ###############################################################################
 ### Begin plot
-fig = plt.figure(figsize=(8,4))
-ax = plt.subplot(111)
+fig = plt.figure(figsize=(8,6))
+ax = plt.subplot(211)
 
 adjust_spines(ax, ['left', 'bottom'])
 ax.spines['top'].set_color('none')
@@ -109,6 +109,7 @@ for i in range(len(rects)):
 plt.fill_between(x=years[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
              alpha=0.3,edgecolor='none')
 
+plt.text(1990,1.05,r'\textbf{[a]}',color='k',fontsize=7,ha='center')  
 plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=6)
 plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
 plt.xlim([1990,2020])   
@@ -116,9 +117,44 @@ plt.ylim([0,1])
 
 plt.text(1990,0.9,r'\textbf{ACTUAL HIATUS}',fontsize=20,color='maroon',alpha=0.4)
 plt.text(1990,0.8,r'\textbf{{PREDICTED HIATUS}',fontsize=20,color='maroon',alpha=1) 
-plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)      
+plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)    
+
+###############################################################################
+ax = plt.subplot(212)
+
+### Read in IPO index for observations
+directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/IPO/'
+IPO = np.genfromtxt(directoryoutput + 'IPO_ERA5_1990-2020.txt')
+
+### Begin plot
+adjust_spines(ax, ['left', 'bottom'])
+ax.spines['top'].set_color('none')
+ax.spines['right'].set_color('none')
+ax.spines['left'].set_color('dimgrey')
+ax.spines['bottom'].set_color('dimgrey')
+ax.spines['left'].set_linewidth(2)
+ax.spines['bottom'].set_linewidth(2)
+ax.tick_params('both',length=4,width=2,which='major',color='dimgrey')
+ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35,clip_on=False)
+
+IPO_masked = np.ma.masked_less_equal(IPO, 0)
+
+plt.bar(years,IPO,color='deepskyblue',
+        edgecolor='darkblue',zorder=9,linewidth=0.3) 
+plt.bar(years,IPO_masked,
+        color='crimson',edgecolor='darkred',zorder=9,clip_on=False,
+        linewidth=0.3) 
+
+plt.yticks(np.arange(-5,5,0.5),map(str,np.round(np.arange(-5,6,0.5),2)),size=6)
+plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
+plt.xlim([1990,2020])   
+plt.ylim([-2.5,2.5])  
+
+plt.text(1990,2.77,r'\textbf{[b]}',color='k',fontsize=7,ha='center')  
+plt.ylabel(r'\textbf{Unfiltered IPO Index}',color='k',fontsize=10)    
         
 plt.tight_layout()
+plt.subplots_adjust(hspace=0.4)
 
 if rm_ensemble_mean == True:
     plt.savefig(directoryfigure + 'FrequencyOfHiatus_LoopSeeds_rmENSEMBLEmean.png',dpi=300)

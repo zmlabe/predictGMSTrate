@@ -116,7 +116,7 @@ plt.fill_between(x=yearsall[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
                  alpha=0.3,edgecolor='none')
 
 plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=6)
-plt.xticks(np.arange(1990,2030+1,10),map(str,np.arange(1990,2030+1,10)),size=6)
+plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
 plt.xlim([1990,2020])   
 plt.ylim([0,1])  
 
@@ -154,7 +154,7 @@ plt.fill_between(x=yearsall[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
              alpha=0.3,edgecolor='none')
 
 plt.yticks(np.arange(0,2,1),map(str,np.round(np.arange(0,2,1),2)),size=6)
-plt.xticks(np.arange(1990,2030+1,10),map(str,np.arange(1990,2030+1,10)),size=6)
+plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
 plt.xlim([1990,2020])   
 plt.ylim([0,1])  
 
