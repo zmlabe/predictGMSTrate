@@ -132,7 +132,7 @@ timetrend_o = linetrend_obsh[:,0]
 timetrend_m = linetrend_mh[:,:,0]
 
 ### Pick example ensemble member 
-exampleens = 3
+exampleens = 19
 
 def adjust_spines(ax, spines):
     for loc, spine in ax.spines.items():
