@@ -35,6 +35,9 @@ else:
     obs_predict = 'ERA5'
 reg_name = 'SMILEGlobe'
 level = 'surface'
+ens1 = np.arange(1,10+1,1)
+ens2 = np.arange(21,50+1,1)
+ens = np.append(ens1,ens2)
 ###############################################################################
 ###############################################################################
 randomalso = False
@@ -192,7 +195,7 @@ norm = c.BoundaryNorm(np.arange(-3,3.1,0.1),csm.N)
 cs = plt.pcolormesh(IPOtest,shading='faceted',edgecolor='w',
                     linewidth=0.05,vmin=-3,vmax=3,norm=norm,cmap=csm)
 
-ensembles = np.arange(1,6+1,1)
+ensembles = map(str,ens[testindices])
 plt.yticks(np.arange(0.5,6.5,1),ensembles,ha='right',va='center',color='k',size=6)
 yax = ax.get_yaxis()
 yax.set_tick_params(pad=2)
@@ -207,7 +210,7 @@ for i in range(act_nan_re.shape[0]):
     for j in range(act_nan_re.shape[1]):
         if pre_nan_re[i,j] == 1:
             cc = 'dimgrey'
-            plt.text(j+0.56,i+0.48,r'\textbf{H}',fontsize=9,
+            plt.text(j+0.56,i+0.48,r'\textbf{S}',fontsize=9,
                 color=cc,va='center',ha='center')
             predictedsaveIPOall.append(IPOtest[i,j])
         if np.isnan(act_nan_re[i,j]) == False:
@@ -217,7 +220,7 @@ for i in range(act_nan_re.shape[0]):
             else:
                 cc = 'k'        
             saveIPO.append(IPOtest[i,j])
-            plt.text(j+0.56,i+0.48,r'\textbf{H}',fontsize=9,
+            plt.text(j+0.56,i+0.48,r'\textbf{S}',fontsize=9,
                 color=cc,va='center',ha='center')
 saveIPO = np.asarray(saveIPO)
 meanIPOsave = np.round(np.nanmean(saveIPO),2)
@@ -233,10 +236,14 @@ cbar.set_ticks(np.arange(-3,3.1,1))
 cbar.set_ticklabels(np.arange(-3,3.1,1),map(str,np.round(np.arange(-3,3.1,1),2)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('dimgrey')
-cbar.set_label(r'\textbf{ANNUAL IPO INDEX [CESM2-LE]}',
+cbar.set_label(r'\textbf{UNFILTERED IPO INDEX}',
                 color='k',labelpad=10,fontsize=23)
 
 plt.ylabel(r'\textbf{Ensemble Member}',color='k',fontsize=12)
+
+plt.text(0,-1.7,r'\textbf{[S] Actual Slowdowns}',color='k',fontsize=10)
+plt.text(0,-1.88,r'\textbf{[S] Wrong Predictions}',color='darkgrey',fontsize=10)
+plt.text(0,-2.06,r'\textbf{[S] Correct Predictions}',color='gold',fontsize=10)
 
 plt.tight_layout()
 plt.savefig(directoryfigure + 'IPO_heatmap_hiatus_v2.png',dpi=300)
