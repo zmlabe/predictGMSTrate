@@ -16,6 +16,7 @@ import palettable.cubehelix as cm
 import cmocean as cmocean
 import calc_dataFunctions as df
 import calc_Stats as dSS
+from netCDF4 import Dataset
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -81,7 +82,7 @@ rm_ensemble_mean = True
 ###############################################################################
 ###############################################################################
 ### Experiment for composites
-nonlinear = 'diff_HIGHposIPO_actual'
+nonlinear = 'diff_posIPO'
 ###############################################################################
 ###############################################################################
 ### Call functions
@@ -233,7 +234,7 @@ elif nonlinear == 'diff_posIPO_actual':
                 ohc_comp_NOclass.append(ohcready[ens,yr,:,:])
         ohc_allenscomp_class.append(ohc_comp_class)
         ohc_allenscomp_NOclass.append(ohc_comp_NOclass)
-if nonlinear == 'diff_HIGHposIPO': 
+elif nonlinear == 'diff_HIGHposIPO': 
     ohc_allenscomp_class = []
     ohc_allenscomp_NOclass = []
     for ens in range(ohcready.shape[0]):
@@ -280,7 +281,34 @@ ohcHIATUS_class = np.nanmean(meanOHCens_class,axis=0)
 ohcHIATUS_NOclass = np.nanmean(meanOHCens_NOclass,axis=0)
 
 ### Difference
-diff = ohcHIATUS_NOclass - ohcHIATUS_class
+diff =  ohcHIATUS_class - ohcHIATUS_NOclass
+
+###############################################################################
+###############################################################################
+###############################################################################
+### Read in LRP
+accurate = True
+if accurate == True:
+    typemodel = 'correcthiatus'
+elif accurate == False:
+    typemodel = 'extrahiatus'
+elif accurate == 'WRONG':
+    typemodel = 'wronghiatus'
+elif accurate == 'HIATUS':
+    typemodel = 'allhiatus'
+    
+### Read in LRP
+datalrp = Dataset(directorydata + 'LRP_comp/LRPMap_comp_' + 'correcthiatus' + '_' + savename + '.nc')
+lrpcorr = datalrp.variables['LRP'][:]
+datalrp.close()
+
+datalrp = Dataset(directorydata + 'LRP_comp/LRPMap_comp_' + 'wronghiatus' + '_' + savename + '.nc')
+lrpwrong = datalrp.variables['LRP'][:]
+datalrp.close()
+
+### Normalize LRP for plotting
+lrpdiff = lrpcorr - lrpwrong
+lrp = lrpdiff/np.max(lrpdiff)
 
 ###############################################################################
 ###############################################################################
@@ -293,7 +321,7 @@ elif rm_ensemble_mean == True:
     limit = np.arange(-1,1.01,0.01)
     barlim = np.round(np.arange(-1,1.1,0.5),2)
 cmap = cmocean.cm.balance
-label = r'\textbf{%s - [ IPO-HIATUS DIFFERENCE ]}' % vari_predict[0]
+label = r'\textbf{%s DIFFERENCE - [ NORMALIZED ]}' % vari_predict[0]
 
 fig = plt.figure()
 ###############################################################################
@@ -313,6 +341,11 @@ circle.set_clip_on(False)
 cs1 = m.contourf(x,y,varn,limit,extend='both',latlon=True)
 cs1.set_cmap(cmap) 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
+
+csc = m.contour(x,y,lrp,np.arange(-0.8,-0.09,0.1),latlon=True,
+                colors='k',linewidths=0.5)
+csc = m.contour(x,y,lrp,np.arange(0.1,0.5,0.1),latlon=True,
+                colors='k',linewidths=0.5)
 
 ###############################################################################
 cbar_ax1 = fig.add_axes([0.38,0.07,0.3,0.02])                

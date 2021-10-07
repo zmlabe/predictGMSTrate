@@ -1,10 +1,9 @@
 """
-Explore raw composites based on indices from predicted testing data and
-showing all the difference OHC levels for OBSERVATIONS
+Plot manuscript figure showing OHC levels
 
 Author     : Zachary M. Labe
-Date       : 21 September 2021
-Version    : 2 (mostly for testing)
+Date       : 7 October 20221
+Version    : 2 
 """
 
 ### Import packages
@@ -32,7 +31,9 @@ dataset_obs = 'ERA5'
 allDataLabels = modelGCMs
 monthlychoiceq = ['annual']
 variables = ['T2M']
-vari_predict = ['SST','OHC100','OHC300','OHC700']
+vari_predict = ['SST','OHC100','OHC300','OHC700','SST','OHC100','OHC300','OHC700']
+vari_predictloop = ['SST','OHC100','OHC300','OHC700']
+obs_predict = 'OHC'
 reg_name = 'SMILEGlobe'
 level = 'surface'
 ###############################################################################
@@ -80,14 +81,6 @@ rm_ensemble_mean = True
 ###############################################################################
 ### Accuracy for composites
 accurate = True
-if accurate == True:
-    typemodel = 'correcthiatus_obs'
-elif accurate == False:
-    typemodel = 'extrahiatus_obs'
-elif accurate == 'WRONG':
-    typemodel = 'wronghiatus_obs'
-elif accurate == 'HIATUS':
-    typemodel = 'allhiatus_obs'
 ###############################################################################
 ###############################################################################
 ### Call functions
@@ -99,7 +92,7 @@ vv = 0
 mo = 0
 variq = variables[vv]
 monthlychoice = monthlychoiceq[mo]
-directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Obs/'
+directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/MS-Figures_v1/'
 saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
 print('*Filename == < %s >' % saveData) 
 
@@ -122,36 +115,37 @@ def read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbi
 ###############################################################################
 ###############################################################################
 ### Loop through to read all the variables
-ohcHIATUS = np.empty((len(vari_predict),92,144))
-for vvv in range(len(vari_predict)):
-    ### Function to read in predictor variables (SST/OHC)
+ohcHIATUS = np.empty((len(vari_predictloop),92,144))
+for vvv in range(len(vari_predictloop)):
     models_var = []
     for i in range(len(modelGCMs)):
-        if vari_predict[vvv][:3] == 'OHC':
-            obs_predict = 'OHC'
-        else:
-            obs_predict = 'ERA5'
-        obsq_var,lats,lons = read_obs_dataset(vari_predict[vvv],obs_predict,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+        dataset = modelGCMs[i]
+        modelsq_var,lats,lons = read_primary_dataset(vari_predict[vvv],dataset,monthlychoice,numOfEns,
+                                                lensalso,randomalso,ravelyearsbinary,
+                                                ravelbinary,shuffletype,timeper,
+                                                lat_bounds,lon_bounds)
         
         ### Save predictor
-        models_var.append(obsq_var)
-    models_var = np.asarray(models_var).squeeze()
+        models_var.append(modelsq_var)
+    models_var = np.asarray(models_var)
     
     ### Remove ensemble mean
     if rm_ensemble_mean == True:
-        models_var = dSS.remove_trend_obs(models_var,'surface')
-        print('\n*Removed observational linear trend*')
+        models_var = dSS.remove_ensemble_mean(models_var,ravel_modelens,
+                                              ravelmodeltime,rm_standard_dev,
+                                              numOfEns)
+        print('\n*Removed ensemble mean*')
     
     ### Standardize
-    models_varravel = models_var.squeeze().reshape(yearsobs.shape[0],lats.shape[0]*lons.shape[0])
+    models_varravel = models_var.squeeze().reshape(numOfEns*yearsall.shape[0],lats.shape[0]*lons.shape[0])
     meanvar = np.nanmean(models_varravel,axis=0)
     stdvar = np.nanstd(models_varravel,axis=0)
     modelsstd_varravel = (models_varravel-meanvar)/stdvar
-    models_var = modelsstd_varravel.reshape(yearsobs.shape[0],lats.shape[0],lons.shape[0])
-    
+    models_var = modelsstd_varravel.reshape(len(modelGCMs),numOfEns,yearsall.shape[0],lats.shape[0],lons.shape[0])
+        
     ### Slice for number of years
-    yearsq_m = np.where((yearsobs >= AGWstart))[0]
-    models_slice = models_var[yearsq_m,:,:]
+    yearsq_m = np.where((yearsall >= AGWstart))[0]
+    models_slice = models_var[:,:,yearsq_m,:,:]
     
     if rm_ensemble_mean == False:
         variq = 'T2M'
@@ -194,81 +188,102 @@ for vvv in range(len(vari_predict)):
     ###############################################################################
     ###############################################################################
     ### Read in data for testing predictions and actual hiatuses
-    actual_test = np.genfromtxt(directorydata + 'obsActualLabels_' + savename + '.txt')
-    predict_test = np.genfromtxt(directorydata + 'obsLabels_' + savename+ '.txt')
+    testindices = np.asarray(np.genfromtxt(directorydata + 'testingEnsIndices_' + savename + '.txt'),dtype=int)
+    actual_test = np.genfromtxt(directorydata + 'testingTrueLabels_' + savename + '.txt')
+    predict_test = np.genfromtxt(directorydata + 'testingPredictedLabels_' + savename+ '.txt')
     
     ### Reshape arrays for [ensemble,year]
-    act_re = actual_test
-    pre_re = predict_test
+    act_re = np.swapaxes(actual_test.reshape(testindices.shape[0],1,years_newmodel.shape[0]),0,1).squeeze()
+    pre_re = np.swapaxes(predict_test.reshape(testindices.shape[0],1,years_newmodel.shape[0]),0,1).squeeze()
     
     ### Slice ensembles for testing data
-    ohcready = models_slice[:,:,:].squeeze()
+    ohcready = models_slice[:,testindices,:act_re.shape[1],:,:].squeeze()
     
     ### Pick all hiatuses
     if accurate == True: ### correct predictions
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (pre_re[yr]) == 1 and (act_re[yr] == 1):
-                ohc_allenscomp.append(ohcready[yr,:,:])
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 1):
+                    ohc_comp.append(ohcready[ens,yr,:,:])
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == False: ### picks all hiatus predictions
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if pre_re[yr] == 1:
-                ohc_allenscomp.append(ohcready[yr,:,:])
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if pre_re[ens,yr] == 1:
+                    ohc_comp.append(ohcready[ens,yr,:,:])
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == 'WRONG': ### picks hiatus but is wrong
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (pre_re[yr]) == 1 and (act_re[yr] == 0):
-                ohc_allenscomp.append(ohcready[yr,:,:])
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 0):
+                    ohc_comp.append(ohcready[ens,yr,:,:])
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == 'HIATUS': ### accurate climate change
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (act_re[yr] == 1):
-                ohc_allenscomp.append(ohcready[yr,:,:])
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (act_re[ens,yr] == 1):
+                    ohc_comp.append(ohcready[ens,yr,:,:])
+            ohc_allenscomp.append(ohc_comp)
     else:
         print(ValueError('SOMETHING IS WRONG WITH ACCURACY COMPOSITES!'))
         sys.exit()
         
-    ### Composite across all years to get hiatuses
-    ohcHIATUS[vvv,:,:] = np.nanmean(np.asarray(ohc_allenscomp),axis=0)
+    ### Composite hiatuses for 8 ensembles
+    meanOHCens = np.empty((len(testindices),lats.shape[0],lons.shape[0]))
+    for i in range(len(ohc_allenscomp)):
+        if len(ohc_allenscomp) > 0:
+            meanOHCens[i,:,:] = np.nanmean(np.asarray(ohc_allenscomp[i]),axis=0)
+        else:
+            meanOHCens[i,:,:] = np.nan
+            
+    ### Composite across all ensembles to get hiatuses
+    ohcHIATUS[vvv,:,:] = np.nanmean(meanOHCens,axis=0)
     
 ###############################################################################
 ###############################################################################
 ### Loop through to read all the variables
-lag1 = 3
-lag2 = 7
+ohcHIATUS_lag = np.empty((len(vari_predictloop),92,144))
+lag1 = 5
+lag2 = 10
 lag = lag2-lag1
-    
-ohcHIATUSlag = np.empty((len(vari_predict),92,144))
-for vvv in range(len(vari_predict)):
-    ### Function to read in predictor variables (SST/OHC)
+for vvv in range(len(vari_predictloop)):
     models_var = []
     for i in range(len(modelGCMs)):
-        if vari_predict[vvv][:3] == 'OHC':
-            obs_predict = 'OHC'
-        else:
-            obs_predict = 'ERA5'
-        obsq_var,lats,lons = read_obs_dataset(vari_predict[vvv],obs_predict,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+        dataset = modelGCMs[i]
+        modelsq_var,lats,lons = read_primary_dataset(vari_predict[vvv],dataset,monthlychoice,numOfEns,
+                                                lensalso,randomalso,ravelyearsbinary,
+                                                ravelbinary,shuffletype,timeper,
+                                                lat_bounds,lon_bounds)
         
         ### Save predictor
-        models_var.append(obsq_var)
-    models_var = np.asarray(models_var).squeeze()
+        models_var.append(modelsq_var)
+    models_var = np.asarray(models_var)
     
     ### Remove ensemble mean
     if rm_ensemble_mean == True:
-        models_var = dSS.remove_trend_obs(models_var,'surface')
-        print('\n*Removed observational linear trend*')
+        models_var = dSS.remove_ensemble_mean(models_var,ravel_modelens,
+                                              ravelmodeltime,rm_standard_dev,
+                                              numOfEns)
+        print('\n*Removed ensemble mean*')
     
     ### Standardize
-    models_varravel = models_var.squeeze().reshape(yearsobs.shape[0],lats.shape[0]*lons.shape[0])
+    models_varravel = models_var.squeeze().reshape(numOfEns*yearsall.shape[0],lats.shape[0]*lons.shape[0])
     meanvar = np.nanmean(models_varravel,axis=0)
     stdvar = np.nanstd(models_varravel,axis=0)
     modelsstd_varravel = (models_varravel-meanvar)/stdvar
-    models_var = modelsstd_varravel.reshape(yearsobs.shape[0],lats.shape[0],lons.shape[0])
-    
+    models_var = modelsstd_varravel.reshape(len(modelGCMs),numOfEns,yearsall.shape[0],lats.shape[0],lons.shape[0])
+        
     ### Slice for number of years
-    yearsq_m = np.where((yearsobs >= AGWstart))[0]
-    models_slice = models_var[yearsq_m,:,:]
+    yearsq_m = np.where((yearsall >= AGWstart))[0]
+    models_slice = models_var[:,:,yearsq_m,:,:]
     
     if rm_ensemble_mean == False:
         variq = 'T2M'
@@ -311,50 +326,98 @@ for vvv in range(len(vari_predict)):
     ###############################################################################
     ###############################################################################
     ### Read in data for testing predictions and actual hiatuses
-    actual_test = np.genfromtxt(directorydata + 'obsActualLabels_' + savename + '.txt')
-    predict_test = np.genfromtxt(directorydata + 'obsLabels_' + savename+ '.txt')
+    testindices = np.asarray(np.genfromtxt(directorydata + 'testingEnsIndices_' + savename + '.txt'),dtype=int)
+    actual_test = np.genfromtxt(directorydata + 'testingTrueLabels_' + savename + '.txt')
+    predict_test = np.genfromtxt(directorydata + 'testingPredictedLabels_' + savename+ '.txt')
     
     ### Reshape arrays for [ensemble,year]
-    act_re = actual_test
-    pre_re = predict_test
+    act_re = np.swapaxes(actual_test.reshape(testindices.shape[0],1,years_newmodel.shape[0]),0,1).squeeze()
+    pre_re = np.swapaxes(predict_test.reshape(testindices.shape[0],1,years_newmodel.shape[0]),0,1).squeeze()
     
     ### Slice ensembles for testing data
-    ohcready = models_slice[:,:,:].squeeze()
+    ohcready = models_slice[:,testindices,:act_re.shape[1],:,:].squeeze()
     
     ### Pick all hiatuses
     if accurate == True: ### correct predictions
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (pre_re[yr]) == 1 and (act_re[yr] == 1):
-                ohc_allenscomp.append(np.nanmean(ohcready[yr+lag1:yr+lag2,:,:],axis=0))
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 1):
+                    if (pre_re[ens,yr-1]) != 1 and (act_re[ens,yr-1] != 1):
+                        ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == False: ### picks all hiatus predictions
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if pre_re[yr] == 1:
-                ohc_allenscomp.append(np.nanmean(ohcready[yr+lag1:yr+lag2,:,:],axis=0))
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if pre_re[ens,yr] == 1:
+                    if pre_re[ens,yr-1] != 1:
+                        ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == 'WRONG': ### picks hiatus but is wrong
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (pre_re[yr]) == 1 and (act_re[yr] == 0):
-                ohc_allenscomp.append(np.nanmean(ohcready[yr+lag1:yr+lag2,:,:],axis=0))
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 0):
+                    if pre_re[ens,yr-1] != 1:
+                        ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
+            ohc_allenscomp.append(ohc_comp)
     elif accurate == 'HIATUS': ### accurate climate change
         ohc_allenscomp = []
-        for yr in range(ohcready.shape[0]):
-            if (act_re[yr] == 1):
-                ohc_allenscomp.append(np.nanmean(ohcready[yr+lag1:yr+lag2,:,:],axis=0))
+        for ens in range(ohcready.shape[0]):
+            ohc_comp = []
+            for yr in range(ohcready.shape[1]):
+                if (act_re[ens,yr] == 1):
+                    if (act_re[ens,yr-1] != 1):
+                        ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
+            ohc_allenscomp.append(ohc_comp)
     else:
         print(ValueError('SOMETHING IS WRONG WITH ACCURACY COMPOSITES!'))
         sys.exit()
         
-    ### Composite across all years to get hiatuses
-    ohcHIATUSlag[vvv,:,:] = np.nanmean(np.asarray(ohc_allenscomp),axis=0)
-
-### Composite all for plotting
-ohc_allcomp = np.append(ohcHIATUS,ohcHIATUSlag,axis=0)
+    ### Composite hiatuses for 8 ensembles
+    meanOHCens = np.empty((len(testindices),lats.shape[0],lons.shape[0]))
+    for i in range(len(ohc_allenscomp)):
+        if len(ohc_allenscomp) > 0:
+            meanOHCens[i,:,:] = np.nanmean(np.asarray(ohc_allenscomp[i]),axis=0)
+        else:
+            meanOHCens[i,:,:] = np.nan
+            
+    ### Composite across all ensembles to get hiatuses
+    ohcHIATUS_lag[vvv,:,:] = np.nanmean(meanOHCens,axis=0)
+    
+### Get ready to plot
+ohc_allcomp = np.append(ohcHIATUS,ohcHIATUS_lag,axis=0)
 
 ###############################################################################
 ###############################################################################
-### Plot subplot of obser+++++++++++++++vations
+###############################################################################
+### Read in LRP
+accurate = True
+if accurate == True:
+    typemodel = 'correcthiatus'
+elif accurate == False:
+    typemodel = 'extrahiatus'
+elif accurate == 'WRONG':
+    typemodel = 'wronghiatus'
+elif accurate == 'HIATUS':
+    typemodel = 'allhiatus'
+    
+### Read in LRP
+datalrp = Dataset(directorydata + 'LRP_comp/LRPMap_comp_' + typemodel + '_' + savename + '.nc')
+lrpin = datalrp.variables['LRP'][:]
+datalrp.close()
+
+### Normalize LRP for plotting
+lrp = lrpin/np.max(lrpin)
+
+###############################################################################
+###############################################################################
+###############################################################################
+### Plot subplot of observations
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n"]
 plotloc = [1,3,5,7,2,4,6,8]
 if rm_ensemble_mean == False:
@@ -364,7 +427,7 @@ elif rm_ensemble_mean == True:
     limit = np.arange(-1.5,1.6,0.02)
     barlim = np.round(np.arange(-1.5,1.6,0.5),2)
 cmap = cmocean.cm.balance
-label = r'\textbf{[ HIATUS COMPOSITE ]}'
+label = r'\textbf{NORMALIZED}'
 
 fig = plt.figure(figsize=(8,10))
 ###############################################################################
@@ -384,6 +447,10 @@ for ppp in range(ohc_allcomp.shape[0]):
     circle.set_clip_on(False)
     
     cs1 = m.contourf(x,y,varn,limit,extend='both',latlon=True)
+    if ppp == 1:
+        csc = m.contour(x,y,lrp,np.arange(0.25,1.1,0.25),linestyles='-',latlon=True,
+                        colors='gold',linewidths=1)
+    
     cs1.set_cmap(cmap) 
     m.fillcontinents(color='dimgrey',lake_color='dimgrey')
             
@@ -395,9 +462,9 @@ for ppp in range(ohc_allcomp.shape[0]):
                       textcoords='axes fraction',color='dimgrey',fontsize=20,
                       rotation=90,ha='center',va='center')
     if ppp == 0:
-        plt.title(r'\textbf{Onset}',fontsize=15,color='k') 
+        plt.title(r'\textbf{ONSET OF SLOWDOWN}',fontsize=12,color='k') 
     if ppp == 4:
-        plt.title(r'\textbf{%s-Year Composite}' % lag,fontsize=15,color='k')           
+        plt.title(r'\textbf{5-10 YEARS AFTER SLOWDOWN ONSET}',fontsize=12,color='k')           
     
 ###############################################################################
 cbar_ax1 = fig.add_axes([0.38,0.05,0.3,0.02])                
@@ -411,7 +478,4 @@ cbar1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()
 plt.subplots_adjust(bottom=0.08,wspace=0.01)
-if rm_ensemble_mean == True:
-    plt.savefig(directoryfigure + 'RawCompositesHiatus_OBSERVATIONS_OHClevels-lag%s_v2_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (lag,accurate,accurate),dpi=300)
-else:
-    plt.savefig(directoryfigure + 'RawCompositesHiatus_OBSERVATIONS_OHClevels-lag%s_v2_AccH-%s_AccR-%s.png' % (lag,accurate,accurate),dpi=300)
+plt.savefig(directoryfigure + 'Figure_4.png',dpi=600)
