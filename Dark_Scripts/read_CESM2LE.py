@@ -209,7 +209,7 @@ def read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper
         print(time[yearhistq])
         histmodel = ensshape[:,yearhistq,:,:]
     elif timeper == 'hiatus':
-        yearhistq = np.where((time >= 1980) & (time <= 2099))[0]
+        yearhistq = np.where((time >= 1979) & (time <= 2099))[0]
         print('FUTURE YEARS')
         print(time[yearhistq])
         histmodel = ensshape[:,yearhistq,:,:]
@@ -223,12 +223,12 @@ def read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper
 # import matplotlib.pyplot as plt
 # import calc_Utilities as UT
 # directory = '/Users/zlabe/Data/CESM2-LE/monthly/'
-# vari = 'T2M'
+# vari = 'OHC100'
 # sliceperiod = 'annual'
 # sliceshape = 4
 # slicenan = 'nan'
 # numOfEns = 40
-# timeper = 'historical'
+# timeper = 'all'
 # lat,lon,var = read_CESM2LE(directory,vari,sliceperiod,sliceshape,slicenan,numOfEns,timeper)
 
 # lon2,lat2 = np.meshgrid(lon,lat)

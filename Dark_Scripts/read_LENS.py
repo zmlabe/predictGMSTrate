@@ -255,6 +255,11 @@ def read_LENS(directory,vari,sliceperiod,slicebase,sliceshape,addclimo,slicenan,
         print('FUTURE YEARS')
         print(time[yearhistq])
         histmodel = ensshape[:,yearhistq,:,:]
+    elif timeper == 'hiatus':
+        yearhistq = np.where((time >= 1980) & (time <= 2099))[0]
+        print('FUTURE YEARS')
+        print(time[yearhistq])
+        histmodel = ensshape[:,yearhistq,:,:]
 
     print('Shape of output FINAL = ', histmodel.shape,[[histmodel.ndim]])
     print('>>>>>>>>>> ENDING read_CESM2LE function!')    

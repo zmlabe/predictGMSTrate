@@ -18,10 +18,12 @@ Usage
     [8] remove_ocean(data,data_obs)
     [9] remove_land(data,data_obs)
     [10] standardize_data(Xtrain,Xtest)
-    [11] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
-    [12] rm_variance_dev(var,window)
-    [13] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
-    [14] smoothedEnsembles(data,lat_bounds,lon_bounds)
+    [11] standardize_dataVal(Xtrain,Xtest,Xval)
+    [12] rm_standard_dev(var,window,ravelmodeltime,numOfEns)
+    [13] rm_variance_dev(var,window)
+    [14] addNoiseTwinSingle(data,integer,sizeOfTwin,random_segment_seed,maskNoiseClass,lat_bounds,lon_bounds)
+    [15] smoothedEnsembles(data,lat_bounds,lon_bounds)
+    [16] remove_trend_obs(datavar,level)
 """
 
 def rmse(a,b):
@@ -114,7 +116,7 @@ def remove_observations_mean(data,data_obs,lats,lons):
 
 ###############################################################################
 
-def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
+def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall,yearsobs):
     """
     Calculates anomalies for each model and observational data set. Note that
     it assumes the years at the moment
@@ -127,12 +129,13 @@ def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
     minyr = baseline.min()
     maxyr = baseline.max()
     yearq = np.where((yearsall >= minyr) & (yearsall <= maxyr))[0]
+    yearobsq = np.where((yearsobs >= minyr) & (yearsobs <= maxyr))[0]
     
     if data.ndim == 5:
         
         ### Slice years
         modelnew = data[:,:,yearq,:,:]
-        obsnew = data_obs[yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
         
         ### Average climatology
         meanmodel = np.nanmean(modelnew[:,:,:,:,:],axis=2)
@@ -141,8 +144,23 @@ def calculate_anomalies(data,data_obs,lats,lons,baseline,yearsall):
         ### Calculate anomalies
         modelanom = data[:,:,:,:,:] - meanmodel[:,:,np.newaxis,:,:]
         obsanom = data_obs[:,:,:] - meanobs[:,:]
+        
+    elif data.ndim == 4:
+        
+        ### Slice years
+        modelnew = data[:,yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
+        
+        ### Average climatology
+        meanmodel = np.nanmean(modelnew[:,:,:,:],axis=1)
+        meanobs = np.nanmean(obsnew,axis=0)
+        
+        ### Calculate anomalies
+        modelanom = data[:,:,:,:] - meanmodel[:,np.newaxis,:,:]
+        obsanom = data_obs[:,:,:] - meanobs[:,:]
+        
     else:
-        obsnew = data_obs[yearq,:,:]
+        obsnew = data_obs[yearobsq,:,:]
         
         ### Average climatology
         meanobs = np.nanmean(obsnew,axis=0)
@@ -282,6 +300,35 @@ def standardize_data(Xtrain,Xtest):
         print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
     
     return Xtrain,Xtest,stdVals
+
+###############################################################################
+
+def standardize_dataVal(Xtrain,Xtest,Xval):
+    """
+    Standardizes training, testing, and validation data
+    """
+    
+    ### Import modulates
+    import numpy as np
+
+    Xmean = np.mean(Xtrain,axis=0)
+    Xstd = np.std(Xtrain,axis=0)
+    
+    Xtest = (Xtest - Xmean)/Xstd
+    Xtrain = (Xtrain - Xmean)/Xstd
+    Xval = (Xval - Xmean)/Xstd
+    
+    stdVals = (Xmean,Xstd)
+    stdVals = stdVals[:]
+    
+    ### If there is a nan (like for land/ocean masks)
+    if np.isnan(np.min(Xtrain)) == True:
+        Xtrain[np.isnan(Xtrain)] = 0
+        Xtest[np.isnan(Xtest)] = 0
+        Xval[np.isnan(Xval)] = 0
+        print('--THERE WAS A NAN IN THE STANDARDIZED DATA!--')
+    
+    return Xtrain,Xtest,Xval,stdVals
 
 ###############################################################################
     
@@ -675,6 +722,147 @@ def smoothedEnsembles(data,lat_bounds,lon_bounds):
     print('--NEW Size of smoothedclass--->',smoothClass.shape)
     print('------- Ending of smoothing the ensembles per model -------')
     return smoothClass
+
+###############################################################################
+
+def remove_trend_obs(datavar,level):
+    """
+    Function removes linear trend
+
+    Parameters
+    ----------
+    datavar : n-d array
+        [year,lat,lon] or [year,month,lat,lon] or [year,month,level,lat,lon]
+    level : string
+        Height of variable (surface or profile)
+    
+    Returns
+    -------
+    datavardt : n-d array
+        [year,lat,lon] or [year,month,lat,lon] or [year,month,level,lat,lon]
+
+    Usage
+    -----
+    datavardt = remove_trend_obs(datavar,level)
+    """
+    print('\n>>> Using remove_trend_obs function! \n')
+    ###########################################################################
+    ###########################################################################
+    ###########################################################################
+    ### Import modules
+    import numpy as np
+    import scipy.stats as sts
+    import sys
+    
+    ### Detrend data array
+    if level == 'surface':
+        if datavar.ndim == 4:
+            x = np.arange(datavar.shape[0])
+            
+            slopes = np.empty((datavar.shape[1],datavar.shape[2],datavar.shape[3]))
+            intercepts = np.empty((datavar.shape[1],datavar.shape[2],
+                                   datavar.shape[3]))
+            for mo in range(datavar.shape[1]):
+                print('Completed: detrended -- Month %s --!' % (mo+1))
+                for i in range(datavar.shape[2]):
+                    for j in range(datavar.shape[3]):
+                        mask = np.isfinite(datavar[:,mo,i,j])
+                        y = datavar[:,mo,i,j]
+                        
+                        if np.sum(mask) == y.shape[0]:
+                            xx = x
+                            yy = y
+                        else:
+                            xx = x[mask]
+                            yy = y[mask]
+                        
+                        if np.isfinite(np.nanmean(yy)):
+                            slopes[mo,i,j],intercepts[mo,i,j], \
+                            r_value,p_value,std_err = sts.linregress(xx,yy)
+                        else:
+                            slopes[mo,i,j] = np.nan
+                            intercepts[mo,i,j] = np.nan
+            print('Completed: Detrended data for each grid point!')
+                                
+            datavardt = np.empty(datavar.shape)
+            for yr in range(datavar.shape[0]):
+                datavardt[yr,:,:,:] = datavar[yr,:,:,:] - (slopes*x[yr] + intercepts)
+        elif datavar.ndim == 3:
+            x = np.arange(datavar.shape[0])
+            
+            slopes = np.empty((datavar.shape[1],datavar.shape[2]))
+            intercepts = np.empty((datavar.shape[1],datavar.shape[2]))
+            for i in range(datavar.shape[1]):
+                for j in range(datavar.shape[2]):
+                    mask = np.isfinite(datavar[:,i,j])
+                    y = datavar[:,i,j]
+                    
+                    if np.sum(mask) == y.shape[0]:
+                        xx = x
+                        yy = y
+                    else:
+                        xx = x[mask]
+                        yy = y[mask]
+                    
+                    if np.isfinite(np.nanmean(yy)):
+                        slopes[i,j],intercepts[i,j], \
+                        r_value,p_value,std_err = sts.linregress(xx,yy)
+                    else:
+                        slopes[i,j] = np.nan
+                        intercepts[i,j] = np.nan
+            print('Completed: Detrended data for each grid point!')
+                                
+            datavardt = np.empty(datavar.shape)
+            for yr in range(datavar.shape[0]):
+                datavardt[yr,:,:] = datavar[yr,:,:] - (slopes*x[yr] + intercepts)
+        else:
+            print(ValueError('SOMETHING IS WRONG WITH OBS!!!!!'))
+            sys.exit()
+                                
+    elif level == 'profile':
+        x = np.arange(datavar.shape[0])
+        
+        slopes = np.empty((datavar.shape[1],datavar.shape[2],
+                          datavar.shape[3],datavar.shape[4]))
+        intercepts = np.empty((datavar.shape[1],datavar.shape[2],
+                      datavar.shape[3],datavar.shape[4]))
+        for mo in range(datavar.shape[1]):
+            print('Completed: detrended -- Month %s --!' % (mo+1))
+            for le in range(datavar.shape[2]):
+                print('Completed: detrended Level %s!' % (le+1))
+                for i in range(datavar.shape[3]):
+                    for j in range(datavar.shape[4]):
+                        mask = np.isfinite(datavar[:,mo,le,i,j])
+                        y = datavar[:,mo,le,i,j]
+                        
+                        if np.sum(mask) == y.shape[0]:
+                            xx = x
+                            yy = y
+                        else:
+                            xx = x[mask]
+                            yy = y[mask]
+                        
+                        if np.isfinite(np.nanmean(yy)):
+                            slopes[mo,le,i,j],intercepts[mo,le,i,j], \
+                            r_value,p_value,std_err= sts.linregress(xx,yy)
+                        else:
+                            slopes[mo,le,i,j] = np.nan
+                            intercepts[mo,le,i,j] = np.nan
+        print('Completed: Detrended data for each grid point!')
+                            
+        datavardt = np.empty(datavar.shape)
+        for yr in range(datavar.shape[1]):
+            datavardt[yr,:,:,:,:] = datavar[yr,:,:,:,:] - \
+                                    (slopes*x[yr] + intercepts)        
+    else:
+        print(ValueError('Selected wrong height - (surface or profile!)!')) 
+        sys.exit()
+
+    ### Save memory
+    del datavar
+    
+    print('\n>>> Completed: Finished remove_trend_obs function!')
+    return datavardt
 
 ###############################################################################
 ###############################################################################

@@ -102,7 +102,7 @@ rects = plt.bar(years,actual_obs[0,:])
 plt.plot(years,freq_obs,linewidth=4,color='maroon',alpha=2,zorder=3,clip_on=False,
           linestyle='--',dashes=(1,0.3))
 for i in range(len(rects)):
-    rects[i].set_color('maroon')
+    rects[i].set_color('teal')
     rects[i].set_edgecolor('w')
     rects[i].set_alpha(0.4)
     
@@ -115,7 +115,7 @@ plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
 plt.xlim([1990,2020])   
 plt.ylim([0,1])  
 
-plt.text(1990,0.9,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='maroon',alpha=0.4)
+plt.text(1990,0.9,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='teal',alpha=0.4)
 plt.text(1990,0.8,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=16,color='maroon',alpha=1) 
 plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)    
 
@@ -145,6 +145,17 @@ plt.bar(years,IPO_masked,
         color='crimson',edgecolor='darkred',zorder=9,clip_on=False,
         linewidth=0.3) 
 
+rects = plt.bar(years,actual_obs[0,:]*2.5)
+for i in range(len(rects)):
+    rects[i].set_color('teal')
+    rects[i].set_edgecolor('w')
+    rects[i].set_alpha(0.4)
+rects = plt.bar(years,actual_obs[0,:]*-2.5)
+for i in range(len(rects)):
+    rects[i].set_color('teal')
+    rects[i].set_edgecolor('w')
+    rects[i].set_alpha(0.4)
+
 plt.yticks(np.arange(-5,5,0.5),map(str,np.round(np.arange(-5,6,0.5),2)),size=6)
 plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
 plt.xlim([1990,2020])   
@@ -156,4 +167,4 @@ plt.ylabel(r'\textbf{Unfiltered IPO Index}',color='k',fontsize=10)
 plt.tight_layout()
 plt.subplots_adjust(hspace=0.4)
 
-plt.savefig(directoryfigure + 'Figure_5.png',dpi=600)
+plt.savefig(directoryfigure + 'Figure_4.png',dpi=600)
