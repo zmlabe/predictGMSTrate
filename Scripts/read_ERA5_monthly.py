@@ -79,7 +79,7 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
                                lat1.shape[0],lon1.shape[0]))
     
     ###########################################################################
-    ### Return absolute temperature (1951-1980 baseline)
+    ### Return absolute temperature (1981-2010 baseline)
     if addclimo == True:
         varmon = datamon
         print('Completed: calculated absolute variable!')
@@ -178,7 +178,7 @@ def read_ERA5_monthly(variq,directory,sliceperiod,sliceyear,sliceshape,addclimo,
         ### "Average Monthly Rate of Precipitation"
         print('*** CURRENT UNITS ---> [[ mm/day ]]! ***')
         
-    print('>>>>>>>>>> ENDING read_ERA5_monthly function!')
+    print('>>>>>>>>>> ENDING read_ERA5_monthly function for -- %s!' % variq)
     return lat1,lon1,varshape
 
 # ### Test functions - do not use!

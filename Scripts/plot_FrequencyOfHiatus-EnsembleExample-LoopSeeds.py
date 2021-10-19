@@ -150,8 +150,8 @@ plt.xticks(np.arange(1990,2100+1,10),map(str,np.arange(1990,2100+1,10)),size=6)
 plt.xlim([1990,2090])   
 plt.ylim([0,1])  
 
-plt.text(2090,0.9,r'\textbf{ACTUAL HIATUS}',fontsize=17,color='maroon',alpha=0.4,ha='right')
-plt.text(2090,0.8,r'\textbf{{PREDICTED HIATUS}',fontsize=17,color='maroon',alpha=1,ha='right') 
+plt.text(2090,0.9,r'\textbf{ACTUAL SLOWDOWN}',fontsize=17,color='maroon',alpha=0.4,ha='right')
+plt.text(2090,0.8,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=17,color='maroon',alpha=1,ha='right') 
 plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)    
 
 ###############################################################################

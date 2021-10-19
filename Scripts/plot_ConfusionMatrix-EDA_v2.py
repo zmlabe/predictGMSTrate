@@ -285,12 +285,12 @@ csm=plt.get_cmap(cmr.ocean_r)
 cs = plt.pcolormesh(plot_cmtest,shading='faceted',edgecolor='w',
                     linewidth=7,cmap=csm,vmin=0,vmax=900)
 
-ylabels = [r'\textbf{Hiatus [n=%s]}' % (np.sum(cm_test,axis=1)[1]),r'\textbf{Climate Change [n=%s]}' % (np.sum(cm_test,axis=1)[0])]
+ylabels = [r'\textbf{Slowdown [n=%s]}' % (np.sum(cm_test,axis=1)[1]),r'\textbf{Decadal Warming [n=%s]}' % (np.sum(cm_test,axis=1)[0])]
 plt.yticks(np.arange(0.5,2.5,1),ylabels,ha='center',color='dimgrey',
            rotation=90,va='center',size=15)
 yax = ax.get_yaxis()
 yax.set_tick_params(pad=20)
-xlabels = [r'\textbf{Climate Change [n=%s]}' % (np.sum(cm_test,axis=0)[0]),r'\textbf{Hiatus [n=%s]}' % (np.sum(cm_test,axis=0)[1])]
+xlabels = [r'\textbf{Decadal Warming [n=%s]}' % (np.sum(cm_test,axis=0)[0]),r'\textbf{Slowdown [n=%s]}' % (np.sum(cm_test,axis=0)[1])]
 plt.xticks(np.arange(0.5,2.5,1),xlabels,ha='center',color='dimgrey',size=15)
 xax = ax.get_xaxis()
 xax.set_tick_params(pad=15)
@@ -300,7 +300,7 @@ for i in range(plot_cmtest.shape[0]):
         plt.text(j+0.5,i+0.5,r'\textbf{%s}' % plot_cmtest[i,j],fontsize=50,
             color='crimson',va='center',ha='center')
         plt.text(j+0.5,i+0.34,r'\textbf{Recall = %s \%% }' % (np.round(plot_cmtestNORM[i,j]*100,1)),fontsize=10,
-            color='dimgrey',va='center',ha='center')
+            color='k',va='center',ha='center')
         plt.text(j+0.5,i+0.29,r'\textbf{Precision = %s \%% }' % (np.round(plot_cmtestPRED[i,j]*100,1)),fontsize=10,
             color='k',va='center',ha='center')
         if any([(i==0) & (j==1),(i==1) & (j==0)]):
@@ -318,8 +318,7 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TESTING [Accuracy = %s \%%, Recall = %s \%%, Precision = %s \%%]}' % ((np.round(acctest,3)*100),(np.round(recalltest,3)*100),
-               (np.round(prectest*100,1))),color='k',labelpad=10,fontsize=15)
+cbar.set_label(r'\textbf{TESTING DATA}',color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:

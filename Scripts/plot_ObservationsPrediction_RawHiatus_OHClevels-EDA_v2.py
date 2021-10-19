@@ -298,3 +298,38 @@ if rm_ensemble_mean == True:
     plt.savefig(directoryfigure + 'RawCompositesHiatus_OBSERVATIONS_OHClevels_v2_AccH-%s_AccR-%s_rmENSEMBLEmean.png' % (accurate,accurate),dpi=300)
 else:
     plt.savefig(directoryfigure + 'RawCompositesHiatus_OBSERVATIONS_OHClevels_v2_AccH-%s_AccR-%s.png' % (accurate,accurate),dpi=300)
+    
+def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
+    print('\n>>> Using netcdfOHC function!')
+    
+    from netCDF4 import Dataset
+    import numpy as np
+    
+    name = 'OHC_comp/OHCcomp_OBS_' + typemodel + '_' + saveData + '.nc'
+    filename = directory + name
+    ncfile = Dataset(filename,'w',format='NETCDF4')
+    ncfile.description = 'OHC maps for climate change' 
+    
+    ### Dimensions
+    ncfile.createDimension('lat',var.shape[0])
+    ncfile.createDimension('lon',var.shape[1])
+    
+    ### Variables
+    latitude = ncfile.createVariable('lat','f4',('lat'))
+    longitude = ncfile.createVariable('lon','f4',('lon'))
+    varns = ncfile.createVariable('OHC100','f4',('lat','lon'))
+    
+    ### Units
+    varns.units = 'normalized'
+    ncfile.title = 'OHC100'
+    ncfile.instituion = 'Colorado State University'
+    
+    ### Data
+    latitude[:] = lats
+    longitude[:] = lons
+    varns[:] = var
+    
+    ncfile.close()
+    print('*Completed: Created netCDF4 File!')
+    
+netcdfLRP(lats,lons,ohcHIATUS[1],directorydata,'hiatus_Future',saveData)

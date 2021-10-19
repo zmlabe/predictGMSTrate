@@ -119,7 +119,7 @@ plt.xlim([260,310])
 plt.ylim([0,50])
 plt.ylabel(r'\textbf{F1-Score [\%] in Testing Data}',color='k',
            fontsize=10)
-plt.xlabel(r'\textbf{Number of Hiatus Events in Training Data}',color='k',
+plt.xlabel(r'\textbf{Number of Slowdown Events in Training Data}',color='k',
            fontsize=10)
 
 plt.text(310.2,1,r'\textbf{R$^{2}$=%s}' % (np.round(r**2,2)),

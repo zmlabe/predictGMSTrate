@@ -290,8 +290,8 @@ m.drawgreatcircle(lo1, la1, lo1, la2,linewidth=1.5,color='aqua',zorder=4)
 m.drawgreatcircle(lo2, la2, lo2, la1,linewidth=1.5,color='aqua',zorder=4)
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
 
-plt.title(r'\textbf{CORRECT OTHER PREDICTIONS}',fontsize=13,color='dimgrey')         
-ax2.annotate(r'\textbf{[%s]}' % letters[1],xy=(0,0),xytext=(0.98,0.84),
+plt.title(r'\textbf{CORRECT DECADAL WARMING PREDICTIONS}',fontsize=13,color='dimgrey')         
+ax2.annotate(r'\textbf{[%s]}' % letters[2],xy=(0,0),xytext=(0.98,0.84),
               textcoords='axes fraction',color='k',fontsize=9,
               rotation=0,ha='center',va='center')
 
@@ -314,7 +314,7 @@ csc = m.contour(x,y,hiatus_correctz,np.arange(0.2,1.1,0.2),linestyles='-',latlon
 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
 plt.title(r'\textbf{SLOWDOWN COMPOSITE}',fontsize=13,color='dimgrey')         
-ax2.annotate(r'\textbf{[%s]}' % letters[2],xy=(0,0),xytext=(0.98,0.84),
+ax2.annotate(r'\textbf{[%s]}' % letters[1],xy=(0,0),xytext=(0.98,0.84),
               textcoords='axes fraction',color='k',fontsize=9,
               rotation=0,ha='center',va='center')
 
@@ -344,7 +344,7 @@ cs4 = m.contourf(x,y,ohc_cc,limitd,extend='both',latlon=True)
 cs4.set_cmap(cmapd) 
 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-plt.title(r'\textbf{OTHER COMPOSITE}',fontsize=13,color='dimgrey')         
+plt.title(r'\textbf{DECADAL WARMING COMPOSITE}',fontsize=13,color='dimgrey')         
 ax2.annotate(r'\textbf{[%s]}' % letters[3],xy=(0,0),xytext=(0.98,0.84),
               textcoords='axes fraction',color='k',fontsize=9,
               rotation=0,ha='center',va='center')
@@ -353,20 +353,20 @@ ax2.annotate(r'\textbf{[%s]}' % letters[3],xy=(0,0),xytext=(0.98,0.84),
 cbar_ax1 = fig.add_axes([0.155,0.1,0.2,0.025])                
 cbar1 = fig.colorbar(cs1,cax=cbar_ax1,orientation='horizontal',
                     extend='max',extendfrac=0.07,drawedges=False)
-cbar1.set_label(label,fontsize=6,color='dimgrey',labelpad=1.4)  
+cbar1.set_label(label,fontsize=10,color='dimgrey',labelpad=1.4)  
 cbar1.set_ticks(barlim)
 cbar1.set_ticklabels(list(map(str,barlim)))
-cbar1.ax.tick_params(axis='x', size=.01,labelsize=4)
+cbar1.ax.tick_params(axis='x', size=.01,labelsize=7)
 cbar1.outline.set_edgecolor('dimgrey')
 
 ###############################################################################
 cbar_axd1 = fig.add_axes([0.65,0.1,0.2,0.025])                
 cbard1 = fig.colorbar(cs4,cax=cbar_axd1,orientation='horizontal',
                     extend='both',extendfrac=0.07,drawedges=False)
-cbard1.set_label(labeld,fontsize=6,color='dimgrey',labelpad=1.4)  
+cbard1.set_label(labeld,fontsize=10,color='dimgrey',labelpad=1.4)  
 cbard1.set_ticks(barlimd)
 cbard1.set_ticklabels(list(map(str,barlimd)))
-cbard1.ax.tick_params(axis='x', size=.01,labelsize=4)
+cbard1.ax.tick_params(axis='x', size=.01,labelsize=7)
 cbard1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()

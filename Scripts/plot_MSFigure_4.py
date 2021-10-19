@@ -106,17 +106,18 @@ for i in range(len(rects)):
     rects[i].set_edgecolor('w')
     rects[i].set_alpha(0.4)
     
-plt.fill_between(x=years[-10:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
+plt.fill_between(x=years[-9:],y1=0,y2=1,facecolor='darkgrey',zorder=0,
              alpha=0.3,edgecolor='none')
 
 plt.text(1990,1.05,r'\textbf{[a]}',color='k',fontsize=7,ha='center')  
-plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=6)
-plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
+plt.yticks(np.arange(0,2,0.1),map(str,np.round(np.arange(0,2,0.1),2)),size=8)
+plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=8)
 plt.xlim([1990,2020])   
 plt.ylim([0,1])  
 
-plt.text(1990,0.9,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='teal',alpha=0.4)
-plt.text(1990,0.8,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=16,color='maroon',alpha=1) 
+plt.text(1990,0.8,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='teal',alpha=0.4)
+plt.text(1990,0.9,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=16,color='maroon',alpha=1) 
+plt.text(1990,0.7,r'\textbf{FUTURE DECADES}',fontsize=16,color='darkgrey',alpha=1) 
 plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)    
 
 ###############################################################################
@@ -156,8 +157,8 @@ for i in range(len(rects)):
     rects[i].set_edgecolor('w')
     rects[i].set_alpha(0.4)
 
-plt.yticks(np.arange(-5,5,0.5),map(str,np.round(np.arange(-5,6,0.5),2)),size=6)
-plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=6)
+plt.yticks(np.arange(-5,5,0.5),map(str,np.round(np.arange(-5,6,0.5),2)),size=8)
+plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=8)
 plt.xlim([1990,2020])   
 plt.ylim([-2.5,2.5])  
 
