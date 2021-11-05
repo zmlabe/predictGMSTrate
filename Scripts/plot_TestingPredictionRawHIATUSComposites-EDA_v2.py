@@ -336,4 +336,4 @@ def netcdfLRP(lats,lons,var,directory,typemodel,saveData):
     ncfile.close()
     print('*Completed: Created netCDF4 File!')
     
-netcdfLRP(lats,lons,ohcHIATUS,directorydata,'hiatus_True',saveData)
+# netcdfLRP(lats,lons,ohcHIATUS,directorydata,'hiatus_True',saveData)

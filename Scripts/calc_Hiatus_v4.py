@@ -71,6 +71,7 @@ def calc_thresholdOfTrend(data,trendlength,years,AGWstart,typeOfTrend):
         slope = linetrend[:,0]
         stdslope = np.nanstd(slope)
         meantrend = np.nanmean(slope)
+        print(meantrend,stdslope,slope)
         
         print('\n**%s** is %s years long!' % (typeOfTrend,trendlength))
         print('-- Number of years is',yearsnew.shape[0],'and number of trends is',slope.shape[0],'--')
@@ -173,6 +174,8 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffB
             yearstrend[hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
             datatrend[hi,:] = data[hi:hi+trendlength]
 
+        print(yearstrend)
+        print(datatrend)
         ### Calculate trend lines    
         linetrend = np.empty((len(yearsnew)-trendlength+1,2))
         for hi in range(len(yearsnew)-trendlength+1):         

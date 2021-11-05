@@ -115,9 +115,9 @@ plt.xticks(np.arange(1990,2030+1,5),map(str,np.arange(1990,2030+1,5)),size=8)
 plt.xlim([1990,2020])   
 plt.ylim([0,1])  
 
-plt.text(1990,0.8,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='teal',alpha=0.4)
-plt.text(1990,0.9,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=16,color='maroon',alpha=1) 
-plt.text(1990,0.7,r'\textbf{FUTURE DECADES}',fontsize=16,color='darkgrey',alpha=1) 
+plt.text(1998.6,1.02,r'\textbf{ACTUAL SLOWDOWN}',fontsize=16,color='teal',alpha=0.4)
+plt.text(1990.5,0.4,r'\textbf{{PREDICTED SLOWDOWN}',fontsize=16,color='maroon',alpha=1) 
+plt.text(2012.25,1.02,r'\textbf{FUTURE DECADES}',fontsize=16,color='darkgrey',alpha=1) 
 plt.ylabel(r'\textbf{Frequency of Classification}',color='k',fontsize=10)    
 
 ###############################################################################

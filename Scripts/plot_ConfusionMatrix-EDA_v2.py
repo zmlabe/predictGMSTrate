@@ -20,7 +20,7 @@ import calc_Utilities as UT
 import calc_dataFunctions as df
 import calc_Stats as dSS
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score,recall_score
+from sklearn.metrics import accuracy_score,confusion_matrix,precision_recall_fscore_support,plot_confusion_matrix,precision_score,recall_score,f1_score
 
 ### Plotting defaults 
 plt.rc('text',usetex=True)
@@ -136,6 +136,16 @@ def recallTotalTime(data_pred,data_true):
     
     return recalldata_pred
 
+def f1TotalTime(data_pred,data_true):
+    """
+    Compute f1 for the entire time series
+    """
+    data_truer = data_true
+    data_predr = data_pred
+    f1data_pred = f1_score(data_truer,data_predr)
+    
+    return f1data_pred
+
 acctrain = accuracyTotalTime(predict_train,actual_train)     
 acctest = accuracyTotalTime(predict_test,actual_test)
 print('Accuracy Training == ',np.round(acctrain,3))
@@ -146,6 +156,10 @@ prectest = precisionTotalTime(predict_test,actual_test)
 
 recalltrain = recallTotalTime(predict_train,actual_train)     
 recalltest = recallTotalTime(predict_test,actual_test)
+
+f1_train = f1TotalTime(predict_train,actual_train)     
+f1_test = f1TotalTime(predict_test,actual_test)
+print(acctest,prectest,recalltest,f1_test)
 
 ###############################################################################
 ###############################################################################

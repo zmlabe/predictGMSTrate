@@ -372,7 +372,6 @@ def loadmodel(Xtrain,Xval,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_
 XtrainS,XtestS,XvalS,stdVals = dSS.standardize_dataVal(Xtrain,Xtest,Xval)
 Xmean, Xstd = stdVals  
 
-sys.exit()
 ###############################################################################
 ### Compile neural network
 model,history = loadmodel(XtrainS,XvalS,Ytrain,Yval,hidden,random_network_seed,n_epochs,batch_size,lr_here,ridgePenalty,actFun,class_weight,input_shape,output_shape,fractWeight)
@@ -434,7 +433,7 @@ plt.plot(actualobs,alpha=0.5,linewidth=2,label='actual hiatus obs')
 plt.xlabel('years')
 plt.ylabel('hiatus=1')
 plt.legend()
-
+sys.exit()
 ###############################################################################
 ###############################################################################
 ###############################################################################

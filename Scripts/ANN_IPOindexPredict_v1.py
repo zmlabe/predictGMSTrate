@@ -321,4 +321,5 @@ recallval = recallTotalTime(ypred_pickval,actual_val)
 f1_train = f1TotalTime(ypred_picktrain,actual_train)     
 f1_test = f1TotalTime(ypred_picktest,actual_test)
 f1_val = f1TotalTime(ypred_pickval,actual_val)
-print(acctest,prectest,recalltest,f1_test)
+print('accuracy =',np.round(acctest,2),', precision =',np.round(prectest,2),
+      ', recall =',np.round(recalltest,2),', F1 =',np.round(f1_test,2))

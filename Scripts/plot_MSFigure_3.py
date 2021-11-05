@@ -290,7 +290,7 @@ m.drawgreatcircle(lo1, la1, lo1, la2,linewidth=1.5,color='aqua',zorder=4)
 m.drawgreatcircle(lo2, la2, lo2, la1,linewidth=1.5,color='aqua',zorder=4)
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
 
-plt.title(r'\textbf{CORRECT DECADAL WARMING PREDICTIONS}',fontsize=13,color='dimgrey')         
+plt.title(r'\textbf{CORRECT \textit{NO} SLOWDOWN PREDICTIONS}',fontsize=13,color='dimgrey')         
 ax2.annotate(r'\textbf{[%s]}' % letters[2],xy=(0,0),xytext=(0.98,0.84),
               textcoords='axes fraction',color='k',fontsize=9,
               rotation=0,ha='center',va='center')
@@ -344,7 +344,7 @@ cs4 = m.contourf(x,y,ohc_cc,limitd,extend='both',latlon=True)
 cs4.set_cmap(cmapd) 
 
 m.fillcontinents(color='dimgrey',lake_color='dimgrey')
-plt.title(r'\textbf{DECADAL WARMING COMPOSITE}',fontsize=13,color='dimgrey')         
+plt.title(r'\textbf{\textit{NO} SLOWDOWN COMPOSITE}',fontsize=13,color='dimgrey')         
 ax2.annotate(r'\textbf{[%s]}' % letters[3],xy=(0,0),xytext=(0.98,0.84),
               textcoords='axes fraction',color='k',fontsize=9,
               rotation=0,ha='center',va='center')
@@ -371,4 +371,6 @@ cbard1.outline.set_edgecolor('dimgrey')
 
 plt.tight_layout()
 plt.subplots_adjust(hspace=-0.4)
-plt.savefig(directoryfigure + 'Figure_3.png',dpi=300)
+
+plt.text(2.6,50.5,r'\textbf{-- LRP: Relevance}',fontsize=8,color='gold')
+plt.savefig(directoryfigure + 'Figure_3.png',dpi=600)
