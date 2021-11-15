@@ -388,19 +388,20 @@ actual_classval = np.asarray(actual_classval,dtype=int)
 ###############################################################################
 ###############################################################################
 ###############################################################################
-### Prediction for training/testing
+### Prediction for training
 ypred_train = model.predict(XtrainS,verbose=1)
 ypred_picktrain = np.argmax(ypred_train,axis=1)
+
+### Prediction for testing
 ypred_test = model.predict(XtestS,verbose=1)
 ypred_picktest = np.argmax(ypred_test,axis=1)
 
 ### Prediction for validation
 ypred_val = model.predict(XvalS,verbose=1)
 ypred_pickval = np.argmax(ypred_val,axis=1)
-###############################################################################
-###############################################################################
-###############################################################################
 
+###############################################################################
+###############################################################################
 ###############################################################################
 ### Count hiatuses
 uniquetrain,counttrain = np.unique(ypred_picktrain,return_counts=True)

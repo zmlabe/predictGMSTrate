@@ -248,7 +248,7 @@ elif rm_ensemble_mean == True:
     limit = np.arange(-1.5,1.6,0.02)
     barlim = np.round(np.arange(-1.5,1.6,0.5),2)
 cmap = cmocean.cm.balance
-label = r'\textbf{[OBSERVATIONS HIATUS COMPOSITE ]}'
+label = r'\textbf{NORMALIZED}'
 
 fig = plt.figure(figsize=(4,8))
 ###############################################################################
@@ -271,6 +271,9 @@ for ppp in range(ohcHIATUS.shape[0]):
     if ppp == 1:
         csc = m.contour(x,y,lrp,np.arange(0.15,0.16,0.1),linestyles='-',latlon=True,
                         colors='gold',linewidths=1)
+        
+    if ppp == 0:
+        plt.title(r'\textbf{FUTURE SLOWDOWN}',color='k',fontsize=12)
     
     cs1.set_cmap(cmap) 
     m.fillcontinents(color='dimgrey',lake_color='dimgrey')

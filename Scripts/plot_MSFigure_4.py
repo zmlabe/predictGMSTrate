@@ -81,6 +81,11 @@ for lo in range(COUNTER):
 countobs = np.count_nonzero(pred_obs==1,axis=0)
 freq_obs = countobs/COUNTER
 
+timedecade = np.empty((len(years),10))
+for i in range(len(years)):
+    timedecade[i] = np.arange(1990+i,1990+10+i,1) 
+print(timedecade)
+
 ###############################################################################
 ###############################################################################
 ###############################################################################

@@ -146,7 +146,16 @@ for plo in range(len(hiddenall)):
         plt.ylim([80,100])
         ax.axes.yaxis.set_ticklabels([])
     
-    if any([plo==3,plo==4,plo==5]):
+    if plo==3:
+        plt.text(-0.35,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
+                  ha='left',va='center')
+        plt.text(1.05,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
+                  ha='center',va='center')
+        plt.text(2.4,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[2],fontsize=5,color='k',
+                  ha='right',va='center')
+        plt.text(3.27,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[3],fontsize=5,color='dimgrey',
+                  ha='right',va='center')
+    elif any([plo==4,plo==5]):
         plt.text(-0.35,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
                   ha='left',va='center')
         plt.text(1.05,78,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
@@ -221,7 +230,16 @@ for plo in range(len(hiddenall)):
         plt.ylim([0,60])
         ax.axes.yaxis.set_ticklabels([])
     
-    if any([plo==3,plo==4,plo==5]):
+    if plo==3:
+        plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
+                  ha='left',va='center')
+        plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
+                  ha='center',va='center')
+        plt.text(2.4,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[2],fontsize=5,color='k',
+                  ha='right',va='center')
+        plt.text(3.27,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[3],fontsize=5,color='dimgrey',
+                  ha='right',va='center')
+    elif any([plo==4,plo==5]):
         plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
                   ha='left',va='center')
         plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
@@ -296,7 +314,16 @@ for plo in range(len(hiddenall)):
         plt.ylim([0,60])
         ax.axes.yaxis.set_ticklabels([])
     
-    if any([plo==3,plo==4,plo==5]):
+    if plo==3:
+        plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
+                  ha='left',va='center')
+        plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
+                  ha='center',va='center')
+        plt.text(2.4,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[2],fontsize=5,color='k',
+                  ha='right',va='center')
+        plt.text(3.27,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[3],fontsize=5,color='dimgrey',
+                  ha='right',va='center')
+    elif any([plo==4,plo==5]):
         plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
                   ha='left',va='center')
         plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
@@ -371,7 +398,16 @@ for plo in range(len(hiddenall)):
         plt.ylim([0,60])
         ax.axes.yaxis.set_ticklabels([])
     
-    if any([plo==3,plo==4,plo==5]):
+    if plo==3:
+        plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
+                  ha='left',va='center')
+        plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
+                  ha='center',va='center')
+        plt.text(2.4,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[2],fontsize=5,color='k',
+                  ha='right',va='center')
+        plt.text(3.27,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[3],fontsize=5,color='dimgrey',
+                  ha='right',va='center')
+    elif any([plo==4,plo==5]):
         plt.text(-0.35,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
                   ha='left',va='center')
         plt.text(1.05,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
@@ -463,7 +499,16 @@ for plo in range(len(hiddenall)):
         plt.ylim([0,60])
         ax.axes.yaxis.set_ticklabels([])
     
-    if any([plo==3,plo==4,plo==5]):
+    if plo==3:
+        plt.text(-0.7,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
+                  ha='left',va='center')
+        plt.text(2.1,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',
+                  ha='center',va='center')
+        plt.text(4.7,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[2],fontsize=5,color='k',
+                  ha='right',va='center')
+        plt.text(6.5,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[3],fontsize=5,color='dimgrey',
+                  ha='right',va='center')
+    elif any([plo==4,plo==5]):
         plt.text(-0.7,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[0],fontsize=5,color='dimgrey',
                   ha='left',va='center')
         plt.text(2.1,-6,r'\textbf{L$_{2}$=%s}' % ridgePenaltyall[1],fontsize=5,color='dimgrey',

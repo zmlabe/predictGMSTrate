@@ -144,7 +144,7 @@ ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.35)
 weights_count_pre = np.ones_like(totalcounts_pre)/len(totalcounts_pre)
 n_count_pre, bins_count_pre, patches_count_pre = plt.hist(totalcounts_pre,bins=np.arange(-1,21,1)-0.5,
                                         density=False,alpha=0.6,
-                                        label=r'\textbf{1990-2049}',
+                                        label=r'\textbf{1990-2039}',
                                         weights=weights_count_pre,zorder=3)
 for i in range(len(patches_count_pre)):
     patches_count_pre[i].set_facecolor('teal')
@@ -154,7 +154,7 @@ for i in range(len(patches_count_pre)):
 weights_count_pos = np.ones_like(totalcounts_pos)/len(totalcounts_pos)
 n_count_pos, bins_count_pos, patches_count_pos = plt.hist(totalcounts_pos,bins=np.arange(-1,21,1)-0.5,
                                         density=False,alpha=0.6,
-                                        label=r'\textbf{2050-2090}',
+                                        label=r'\textbf{2040-2090}',
                                         weights=weights_count_pos,zorder=3)
 for i in range(len(patches_count_pre)):
     patches_count_pos[i].set_facecolor('maroon')

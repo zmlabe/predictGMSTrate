@@ -174,8 +174,6 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffB
             yearstrend[hi,:] = np.arange(yearsnew[hi],yearsnew[hi]+trendlength,1)
             datatrend[hi,:] = data[hi:hi+trendlength]
 
-        print(yearstrend)
-        print(datatrend)
         ### Calculate trend lines    
         linetrend = np.empty((len(yearsnew)-trendlength+1,2))
         for hi in range(len(yearsnew)-trendlength+1):         
@@ -203,7 +201,6 @@ def calc_HiatusAcc(data,trendlength,years,AGWstart,SLOPEthresh,typeOfTrend,diffB
         print('Years-Trend ---->\n',yearsnew)
         
         ens = len(data)
-        
         ### Calculate trend periods
         yearstrend = np.empty((ens,len(yearsnew)-trendlength+1,trendlength))
         datatrend = np.empty((ens,len(yearsnew)-trendlength+1,trendlength))

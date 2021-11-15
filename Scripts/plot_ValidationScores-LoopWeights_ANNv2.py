@@ -30,6 +30,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 ### Hyperparamters for files of the ANN model
 rm_ensemble_mean = True
 lengthOfWeightTests = 11
+classWeighto = 8.888112
 directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Scores/'
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m"]
 
@@ -140,7 +141,7 @@ ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.2,clip_on=False)
 plt.plot(fractWeight,acc_vall,color='maroon',linewidth=4,linestyle='-',
          clip_on=False)
     
-plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1),2)),size=6)
+plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1)*classWeighto,1)),size=6)
 plt.yticks(np.arange(0,101,10),map(str,np.arange(0,101,10)),size=6)
 plt.xlim([0.1,1.1])   
 plt.ylim([0,100])
@@ -166,11 +167,11 @@ ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.2,clip_on=False)
 plt.plot(fractWeight,prec_vall,color='maroon',linewidth=4,linestyle='-',
          clip_on=False,label=r'\textbf{VALIDATION}')
     
-plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1),2)),size=6)
+plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1)*classWeighto,1)),size=6)
 plt.yticks(np.arange(0,101,10),map(str,np.arange(0,101,10)),size=6)
 plt.xlim([0.1,1.1])   
 plt.ylim([0,100])
-plt.text(0.73,-13,r'\textbf{Fraction of Class Weights on Hiatus}',fontsize=7,color='k')
+plt.text(0.73,-13,r'\textbf{Class Weights on Slowdowns}',fontsize=7,color='k')
 plt.text(1.11,2,r'\textbf{PRECISION}',fontsize=18,color='dimgrey',
          ha='right')
 plt.text(1.0,93,r'\textbf{[%s]}' % letters[1],color='k',fontsize=9)
@@ -198,7 +199,7 @@ ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.2,clip_on=False)
 plt.plot(fractWeight,recall_vall,color='maroon',linewidth=4,linestyle='-',
          clip_on=False)
     
-plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1),2)),size=6)
+plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1)*classWeighto,1)),size=6)
 plt.yticks(np.arange(0,101,10),map(str,np.arange(0,101,10)),size=6)
 plt.xlim([0.1,1.1])   
 plt.ylim([0,100])
@@ -223,13 +224,14 @@ ax.yaxis.grid(zorder=1,color='dimgrey',alpha=0.2,clip_on=False)
 plt.plot(fractWeight,f1_vall,color='maroon',linewidth=4,linestyle='-',
          clip_on=False)
     
-plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1),2)),size=6)
+plt.xticks(np.arange(0.1,1.2,0.1),map(str,np.round(np.arange(0.1,1.2,0.1)*classWeighto,1)),size=6)
 plt.yticks(np.arange(0,101,10),map(str,np.arange(0,101,10)),size=6)
 plt.xlim([0.1,1.1])   
 plt.ylim([0,100])
 plt.text(1.11,2,r'\textbf{F1-SCORE}',fontsize=18,color='dimgrey',
          ha='right')
 plt.text(1.0,93,r'\textbf{[%s]}' % letters[3],color='k',fontsize=9)
+plt.scatter(fractWeight[4],f1_vall[4],s=40,color='k',zorder=100)
 
 if rm_ensemble_mean == True:
     plt.savefig(directoryfigure + 'ValidationScores-LoopWeights_Hiatus_EDA-v2_rmENSEMBLEmean.png',dpi=300)
