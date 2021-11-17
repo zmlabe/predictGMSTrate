@@ -344,8 +344,8 @@ for vvv in range(len(vari_predictloop)):
             ohc_comp = []
             for yr in range(ohcready.shape[1]):
                 if (pre_re[ens,yr]) == 1 and (act_re[ens,yr] == 1):
-                    if (pre_re[ens,yr-1]) != 1 and (act_re[ens,yr-1] != 1):
-                        ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
+                    # if (pre_re[ens,yr-1]) != 1 and (act_re[ens,yr-1] != 1):
+                    ohc_comp.append(np.nanmean(ohcready[ens,yr+lag1:yr+lag2,:,:],axis=0))
             ohc_allenscomp.append(ohc_comp)
     elif accurate == False: ### picks all hiatus predictions
         ohc_allenscomp = []

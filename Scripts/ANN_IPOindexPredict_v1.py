@@ -107,11 +107,11 @@ random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTre
 random_network_seed = 87750
 hidden = [0]
 n_epochs = 500
-batch_size = 32
+batch_size = 64
 lr_here = 0.001
 ridgePenalty = 0.00
 actFun = 'linear'
-fractWeight = 0.6
+fractWeight = 0.7
 yearsall = np.arange(1990,2090+1,1)
 
 ### Naming conventions for files

@@ -135,7 +135,7 @@ if rm_ensemble_mean == True:
                                           ravelmodeltime,rm_standard_dev,
                                           numOfEns)
     print('\n*Removed ensemble mean*')
-
+sys.exit()
 ### Standardize
 models_varravel = models_var.squeeze().reshape(numOfEns*yearsall.shape[0],lats.shape[0]*lons.shape[0])
 meanvar = np.nanmean(models_varravel,axis=0)
