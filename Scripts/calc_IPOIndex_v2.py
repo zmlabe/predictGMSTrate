@@ -189,7 +189,7 @@ IPOindexz = (IPOindex - np.mean(IPOindex))/np.std(IPOindex)
 
 ### Save IPO index
 directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/IPO/'
-np.savetxt(directoryoutput + 'IPO_CESM2LE_1990-2099.txt',IPOindexz )
+np.savetxt(directoryoutput + 'IPO_CESM2LE_1990-2099.txt',IPOindexz)
 
 ###############################################################################
 ###############################################################################

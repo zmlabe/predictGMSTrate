@@ -1,9 +1,9 @@
 """
-Script for calculating the IPO index in observations
+Script for calculating the global mean sea surface temperature
 
 Author     : Zachary M. Labe
-Date       : 29 September 2021
-Version    : 2
+Date       : 5 January 2022
+Version    : 1
 """
 
 ### Import packages
@@ -87,7 +87,7 @@ lensalso = True
 ###############################################################################
 ###############################################################################
 ### Processing data steps
-rm_ensemble_mean = True
+rm_ensemble_mean = False
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -111,84 +111,44 @@ vv = 0
 mo = 0
 variq = variables[vv]
 monthlychoice = monthlychoiceq[mo]
-directoryfigure = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/PDO/'
 saveData =  monthlychoice + '_' + variq + '_' + reg_name + '_' + dataset_obs
 print('*Filename == < %s >' % saveData) 
 
 ### Read data
-obs,lats,lons = read_obs_dataset(variq,dataset_obs,numOfEns,lensalso,randomalso,ravelyearsbinary,ravelbinary,shuffletype,lat_bounds=lat_bounds,lon_bounds=lon_bounds)
+models,lats,lons = read_primary_dataset(variq,dataset,monthlychoice,numOfEns,
+                                        lensalso,randomalso,ravelyearsbinary,
+                                        ravelbinary,shuffletype,timeper,
+                                        lat_bounds,lon_bounds)
+
+### Slice for number of years to begin hiatus
+AGWstart = 1990
+yearsq_m = np.where((yearsall >= AGWstart))[0]
+yearsq_o = np.where((yearsobs >= AGWstart))[0]
+models_slice = models[:,yearsq_m,:,:]
+
+### Calculate global mean temperature
+lon2,lat2 = np.meshgrid(lons,lats)
 
 ###############################################################################  
 ### Remove ensemble mean
 if rm_ensemble_mean == True:
-    obs = dSS.remove_trend_obs(np.asarray(obs),'surface')
-
-### Slice for number of years to begin hiatus
-AGWstart = 1990
-yearsq_o = np.where((yearsobs >= AGWstart))[0]
-obs_var = obs[yearsq_o,:,:]
-
-### Calculate global mean temperature
-lon2,lat2 = np.meshgrid(lons,lats)
-obsm = UT.calc_weightedAve(obs_var,lat2)
-
-###############################################################################  
-###############################################################################  
-###############################################################################
-### Calculate SST regions
-region1 = obs_var.copy() #  25°N–45°N, 140°E–145°W
-latr1 = np.where((lats >= 25) & (lats <= 45))[0]
-lonr1 = np.where((lons >= 140) & (lons <= (180+(180-145))))[0]
-latRegion1 = lats[latr1]
-lonRegion1 = lons[lonr1]
-lon2r1,lat2r1 = np.meshgrid(lonRegion1,latRegion1)
-sstregion1lat = region1[:,latr1,:]
-sstregion1 = sstregion1lat[:,:,lonr1]
-mean_r1 = UT.calc_weightedAve(sstregion1,lat2r1)
-
-region2 = obs_var.copy() #  10°S–10°N, 170°E–90°W
-latr2 = np.where((lats >= -10) & (lats <= 10))[0]
-lonr2 = np.where((lons >= 170) & (lons <= (180+(180-90))))[0]
-latRegion2 = lats[latr2]
-lonRegion2 = lons[lonr2]
-lon2r2,lat2r2 = np.meshgrid(lonRegion2,latRegion2)
-sstregion2lat = region2[:,latr2,:]
-sstregion2 = sstregion2lat[:,:,lonr2]
-mean_r2 = UT.calc_weightedAve(sstregion2,lat2r2)
-
-region3 = obs_var.copy() #  50°S–15°S, 150°E–160°W
-latr3 = np.where((lats >= -50) & (lats <= -15))[0]
-lonr3 = np.where((lons >= 150) & (lons <= (180+(180-160))))[0]
-latRegion3 = lats[latr3]
-lonRegion3 = lons[lonr3]
-lon2r3,lat2r3 = np.meshgrid(lonRegion3,latRegion3)
-sstregion3lat = region3[:,latr3,:]
-sstregion3 = sstregion3lat[:,:,lonr3]
-mean_r3 = UT.calc_weightedAve(sstregion3,lat2r3)
-
-###############################################################################
-### Calculate IPO
-IPOindex = mean_r2 - ((mean_r1 + mean_r3)/2)
-IPOindexz = (IPOindex - np.mean(IPOindex))/np.std(IPOindex)
-
-sys.exit()
-
-### Save IPO index
-directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/IPO/'
-np.savetxt(directoryoutput + 'IPO_ERA5_1990-2020.txt',IPOindexz)
-
-###############################################################################
-###############################################################################
-###############################################################################
-###############################################################################
-### Read in PDO index
-directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
-PDO = np.genfromtxt(directorydata + '/PDO/PDO_ERA5_1990-2020.txt',unpack=True).transpose()
-
-###############################################################################
-### Compare PDO and IPO correlations
-corr = np.empty((obs_var.shape[0]))
-p = np.empty((obs_var.shape[0]))
-for i in range(obs_var.shape[0]):
-    corr[i],p[i] = sts.pearsonr(IPOindexz[i],PDO[i])
-                 
+    models_var = dSS.remove_ensemble_mean(models_slice,ravel_modelens,
+                                          ravelmodeltime,rm_standard_dev,
+                                          numOfEns)
+    
+    ### Calculate global mean
+    gmsst = UT.calc_weightedAve(models_var,lat2)
+    
+    ### Save time series
+    directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/TimeSeries/'
+    np.savetxt(directoryoutput + 'GMSST_RM-ensmean_1990-2099.txt',gmsst)
+    
+elif rm_ensemble_mean == False:
+    models_var = models_slice
+    
+    ### Calculate global mean
+    gmsst = UT.calc_weightedAve(models_var,lat2)
+    
+    ### Save time series
+    directoryoutput = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/TimeSeries/'
+    np.savetxt(directoryoutput + 'GMSST_1990-2099.txt',gmsst)
