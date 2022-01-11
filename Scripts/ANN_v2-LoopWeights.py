@@ -256,38 +256,6 @@ if rm_ensemble_mean == True:
     fractWeight = np.arange(0.1,1.2,0.1)
     input_shape=np.shape(Xtrain)[1]
     output_shape=np.shape(Ytrain)[1]
-    
-    # OHC700
-    # hidden = [20,20]
-    # n_epochs = 500
-    # batch_size = 128
-    # lr_here = 0.001
-    # ridgePenalty = 0.3
-    # actFun = 'relu'
-    # fractWeight = 0.5
-    # input_shape=np.shape(Xtrain)[1]
-    # output_shape=np.shape(Ytrain)[1]
-    
-    # OHC300
-    # hidden = [10,10]
-    # n_epochs = 500
-    # batch_size = 128
-    # lr_here = 0.001
-    # ridgePenalty = 0.15
-    # actFun = 'relu'
-    # fractWeight = 0.5
-    # input_shape=np.shape(Xtrain)[1]
-    # output_shape=np.shape(Ytrain)[1]
-elif rm_ensemble_mean == False:
-    hidden = [20,20]
-    n_epochs = 500
-    batch_size = 128
-    lr_here = 0.001
-    ridgePenalty = 0.05
-    actFun = 'relu'
-    fractWeight = 0.5
-    input_shape=np.shape(Xtrain)[1]
-    output_shape=np.shape(Ytrain)[1]
 else:
     print(ValueError('SOMETHING IS WRONG WITH DATA PROCESSING!'))
     sys.exit()

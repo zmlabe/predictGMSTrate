@@ -4,6 +4,7 @@ Script plots a comparison of GMST data sets for their trends
 Author     : Zachary M. Labe
 Date       : 10 January 2022
 Version    : 2
+Revision   : 1
 """
 
 ### Import packages
