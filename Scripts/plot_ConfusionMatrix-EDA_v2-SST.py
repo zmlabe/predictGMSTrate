@@ -2,8 +2,8 @@
 First exploratory data analysis for making LRP plots of ANNv1
 
 Author     : Zachary M. Labe
-Date       : 2 September 2021
-Version    : 1 (mostly for testing)
+Date       : 12 January 2022
+Version    : 2 (mostly for testing; now using validation data, but tries SST)
 """
 
 ### Import packages
@@ -30,7 +30,7 @@ plt.rc('font',**{'family':'sans-serif','sans-serif':['Avant Garde']})
 rm_ensemble_mean = True
 
 if rm_ensemble_mean == False:
-    vari_predict = ['OHC100']
+    vari_predict = ['SST']
     fac = 0.7
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
@@ -43,7 +43,7 @@ if rm_ensemble_mean == False:
     fractWeight = 0.5
     yearsall = np.arange(1990,2099+1,1)
 elif rm_ensemble_mean == True:
-    vari_predict= ['OHC100']
+    vari_predict= ['SST']
     fac = 0.7
     random_segment_seed = int(np.genfromtxt('/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SelectedSegmentSeed.txt',unpack=True))
     random_network_seed = 87750
@@ -67,9 +67,9 @@ if(rm_ensemble_mean==True):
     savename = savename + '_EnsembleMeanRemoved' 
 
 ### Directories to save files
-directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
-directoryfigureTRAIN = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Training/'
-directoryfigureTEST = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Testing/'
+directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/SST/'
+directoryfigureTRAIN = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Training/SST/'
+directoryfigureTEST = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Testing/SST/'
 
 ###############################################################################
 ###############################################################################
@@ -247,9 +247,9 @@ cbar.set_label(r'\textbf{TRAINING [Accuracy = %s \%%, Recall = %s \%%, Precision
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+    plt.savefig(directoryfigureTRAIN + 'SST_ConfusionMatrix_Train_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
 else:
-    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
+    plt.savefig(directoryfigureTRAIN + 'SST_ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
 
 ###############################################################################
 ###############################################################################
@@ -336,6 +336,6 @@ cbar.set_label(r'\textbf{TESTING DATA}',color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+    plt.savefig(directoryfigureTEST + 'SST_ConfusionMatrix_Test_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
 else:
-    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)
+    plt.savefig(directoryfigureTEST + 'SST_ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)

@@ -2,8 +2,9 @@
 First exploratory data analysis for making LRP plots of ANNv1
 
 Author     : Zachary M. Labe
-Date       : 2 September 2021
-Version    : 1 (mostly for testing)
+Date       : 12 January 2022
+Version    : 1 (constant definition of hiatus)
+Revision   : 1
 """
 
 ### Import packages
@@ -60,16 +61,16 @@ else:
     sys.exit()
 
 ### Naming conventions for files
-dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/'
+dirname = '/Users/zlabe/Documents/Research/GmstTrendPrediction/SavedModels/HiatusConstantDefinition/'
 savename = 'ANNv2_'+vari_predict[0]+'_hiatus_' + actFun + '_L2_'+ str(ridgePenalty)+ '_LR_' + str(lr_here)+ '_Batch'+ str(batch_size)+ '_Iters' + str(n_epochs) + '_' + str(len(hidden)) + 'x' + str(hidden[0]) + '_SegSeed' + str(random_segment_seed) + '_NetSeed'+ str(random_network_seed) 
 
 if(rm_ensemble_mean==True):
     savename = savename + '_EnsembleMeanRemoved' 
 
 ### Directories to save files
-directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/'
-directoryfigureTRAIN = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Training/'
-directoryfigureTEST = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Testing/'
+directorydata = '/Users/zlabe/Documents/Research/GmstTrendPrediction/Data/HiatusConstantDefinition/'
+directoryfigureTRAIN = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Training/HiatusConstantDefinition/'
+directoryfigureTEST = '/Users/zlabe/Desktop/GmstTrendPrediction/ANN_v2/Testing/HiatusConstantDefinition/'
 
 ###############################################################################
 ###############################################################################
@@ -247,9 +248,9 @@ cbar.set_label(r'\textbf{TRAINING [Accuracy = %s \%%, Recall = %s \%%, Precision
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+    plt.savefig(directoryfigureTRAIN + 'ConstantDefinition_ConfusionMatrix_Train_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
 else:
-    plt.savefig(directoryfigureTRAIN + 'ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
+    plt.savefig(directoryfigureTRAIN + 'ConstantDefinition_ConfusionMatrix_Train_Hiatus_EDA-v1.png',dpi=300)
 
 ###############################################################################
 ###############################################################################
@@ -336,6 +337,6 @@ cbar.set_label(r'\textbf{TESTING DATA}',color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
-    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
+    plt.savefig(directoryfigureTEST + 'ConstantDefinition_ConfusionMatrix_Test_Hiatus_EDA-v1_rmENSEMBLEmean.png',dpi=300)
 else:
-    plt.savefig(directoryfigureTEST + 'ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)
+    plt.savefig(directoryfigureTEST + 'ConstantDefinition_ConfusionMatrix_Test_Hiatus_EDA-v1.png',dpi=300)
