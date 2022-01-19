@@ -1,4 +1,4 @@
-# predictGMSTrate
+# predictGMSTrate [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5879059.svg)](https://doi.org/10.5281/zenodo.5879059)
 Using a neural network to predict changes in the rate of global mean surface temperature warming
 
 ###### Under construction... ```[Python 3.7]```
