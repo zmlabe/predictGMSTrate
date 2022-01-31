@@ -111,7 +111,7 @@ batch_size = 64
 lr_here = 0.001
 ridgePenalty = 0.00
 actFun = 'linear'
-fractWeight = 0.7
+fractWeight = 0.8
 yearsall = np.arange(1990,2090+1,1)
 
 ### Naming conventions for files
@@ -161,7 +161,7 @@ act_reval = np.swapaxes(actual_val.reshape(valindices.shape[0],1,yearsall.shape[
 
 ### Read in SST
 SST = np.genfromtxt(directorydata + 'TimeSeries/GMSST_RM-ensmean_1990-2099.txt',unpack=True)
-# SST = np.genfromtxt(directorydata + 'TimeSeries/GMSST_1990-2099.txt',unpack=True)
+SST = np.genfromtxt(directorydata + 'TimeSeries/GMSST_1990-2099.txt',unpack=True)
 SSTtrain = SST.transpose()[trainindices,:yearsall.shape[0]]
 SSTtest = SST.transpose()[testindices,:yearsall.shape[0]]
 SSTval= SST.transpose()[valindices,:yearsall.shape[0]]
