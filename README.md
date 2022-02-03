@@ -25,7 +25,7 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
     + Cheng L., K. Trenberth, J. Fasullo, T. Boyer, J. Abraham, & Zhu, J. (2017): Improved estimates of ocean heat content from 1960 to 2015, Science Advance, doi10.1126/sciadv.1601545 [[PUBLICATION]](https://advances.sciencemag.org/content/3/3/e1601545)
     
 ## Publications
-+ **[1]** **Labe, Z.M.** and E.A. Barnes (2021), Predicting slowdowns in decadal climate warming trends with explainable neural networks. (*submitted*) [[PREPRINT]](https://www.essoar.org/doi/abs/10.1002/essoar.10508874.1)
++ **[1]** **Labe, Z.M.** and E.A. Barnes (2022), Predicting slowdowns in decadal climate warming trends with explainable neural networks. (*submitted*) [[PREPRINT]](https://www.essoar.org/doi/abs/10.1002/essoar.10508874.2)
 
 
 ## Conferences
