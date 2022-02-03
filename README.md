@@ -29,4 +29,4 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
 
 
 ## Conferences
-+ **[1]** **Labe, Z.M.** and E.A. Barnes. Decadal warming slowdown predictions by an artificial neural network, *2021 Young Scientist Symposium on Atmospheric Research (YSSAR)*, Colorado State University, CO (Oct 2021)
++ **[1]** **Labe, Z.M.** and E.A. Barnes. Decadal warming slowdown predictions by an artificial neural network, *2021 Young Scientist Symposium on Atmospheric Research (YSSAR)*, Colorado State University, CO (Oct 2021) [[SLIDESHARE]](https://www.slideshare.net/ZacharyLabe/decadal-warming-slowdown-predictions-by-an-artificial-neural-network)
