@@ -149,7 +149,7 @@ plt.text(4,-5.4,r'%s' % trainN_list[4],fontsize=8,color='dimgrey',
           ha='center',va='center')
 plt.text(5.0,-5.4,r'%s' % trainN_list[5],fontsize=8,color='dimgrey',
           ha='center',va='center')
-plt.text(6,-5.4,r'%s' % trainN_list[6],fontsize=8,color='k',
+plt.text(6,-5.4,r'%s' % trainN_list[6],fontsize=8,color='dimgrey',
           ha='center',va='center')
 plt.text(7,-5.4,r'%s' % trainN_list[7],fontsize=8,color='dimgrey',
           ha='center',va='center')

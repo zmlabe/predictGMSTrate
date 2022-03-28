@@ -332,7 +332,8 @@ cbar.set_ticks(barlim)
 cbar.set_ticklabels(list(map(str,barlim)))  
 cbar.ax.tick_params(axis='x', size=.001,labelsize=7)
 cbar.outline.set_edgecolor('darkgrey')
-cbar.set_label(r'\textbf{TESTING DATA}',color='k',labelpad=10,fontsize=15)
+cbar.set_label(r'\textbf{TESTING DATA [Accuracy = %s \%%, Recall = %s \%%, Precision = %s \%%]}' % ((np.round(acctest,3)*100),(np.round(recalltest,3)*100),
+               (np.round(prectest*100,1))),color='k',labelpad=10,fontsize=15)
 
 plt.tight_layout()
 if rm_ensemble_mean == True:
