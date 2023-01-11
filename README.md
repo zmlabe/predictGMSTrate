@@ -29,6 +29,8 @@ Zachary Labe - [Research Website](http://sites.uci.edu/zlabe/) - [@ZLabe](https:
 
 
 ## Conferences
++ **[3]** **Labe, Z.M.** and E.A. Barnes. Using artificial neural networks to predict temporary slowdowns in global warming trends, *22nd Conference on Artificial Intelligence for Environmental Science*, Denver, CO (Jan 2023) [[ABSTRACT]](https://ams.confex.com/ams/103ANNUAL/meetingapp.cgi/Paper/415460)[[SLIDESHARE]](https://www.slideshare.net/ZacharyLabe/using-artificial-neural-networks-to-predict-temporary-slowdowns-in-global-warming-trends)
+
 + **[2]** **Labe, Z.M.** and E.A. Barnes. Temporary slowdowns in decadal warming predictions by a neural network, *CLIVAR Climate Dynamics Panel (CDP) annual workshop: External versus internal variability on decadal and longer time scales*, Virtual Workshop (Oct 2022) [[POSTER]](https://zacklabe.files.wordpress.com/2022/09/labebarnes_poster_10-2022.pdf)[[SLIDESHARE]](https://www.slideshare.net/ZacharyLabe/temporary-slowdowns-in-decadal-warming-predictions-by-a-neural-network)
 
 + **[1]** **Labe, Z.M.** and E.A. Barnes. Decadal warming slowdown predictions by an artificial neural network, *2021 Young Scientist Symposium on Atmospheric Research (YSSAR)*, Colorado State University, CO (Oct 2021) [[SLIDESHARE]](https://www.slideshare.net/ZacharyLabe/decadal-warming-slowdown-predictions-by-an-artificial-neural-network)
